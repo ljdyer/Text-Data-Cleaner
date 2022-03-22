@@ -129,7 +129,7 @@ def replace_with_equivalent_chars(df, text_column_name='Text'):
     }
 
     def replace_with_equivalents(string):
-        for find, replace in EQUIVALENTS.items:
+        for find, replace in EQUIVALENTS.items():
             string = string.replace(find, replace)
 
     df[text_column_name] = df[text_column_name].apply(
