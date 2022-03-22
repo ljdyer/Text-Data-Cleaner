@@ -6,6 +6,7 @@ from collections import Counter
 from IPython.display import HTML
 
 
+# ====================
 def show_doc_and_word_counts(df, text_column_name='Text'):
     """Show the number of documents (rows) and words in a text column of a
     pandas dataframe.
@@ -22,6 +23,7 @@ def show_doc_and_word_counts(df, text_column_name='Text'):
     print(f'{num_words_total} words in {num_docs_total} documents (rows).')
 
 
+# ====================
 def preview_regex_replace(find_re, replace_re, df, text_column_name='Text',
                           num_samples=10, chars_before_after=25):
     """Preview the effects of a regex replace operation before you apply it."""
@@ -37,7 +39,7 @@ def preview_regex_replace(find_re, replace_re, df, text_column_name='Text',
                 match_start, match_end = match.span()
                 start_pos = max(0, match_start-chars_before_after)
                 end_pos = min(match_end + chars_before_after, len(text))
-                text_to_display = text[start_pos:end_pos]
+                text_to_display = html.escape(text[start_pos:end_pos])
                 text_before = re.sub(
                     fr'({find_re})', r'<span style="color:red">\1</span>',
                     text_to_display
@@ -59,3 +61,62 @@ def preview_regex_replace(find_re, replace_re, df, text_column_name='Text',
 
     print(f'Total of {len(matches)} matches in {num_docs_with_matches}',
           'documents (rows).')
+
+
+# ====================
+def regex_replace(find_re, replace_re, df, text_column_name='Text',
+                  normalize_spaces=True):
+    """Perform a regex replace operation to all cells of text column of
+    dataframe"""
+
+    df[text_column_name] = df[text_column_name].apply(
+        lambda x: re.sub(find_re, replace_re, x))
+    if normalize_spaces:
+        df = normalize_spaces(df)
+
+    return df
+
+
+# ====================
+def normalize_spaces(df, text_column_name='Text'):
+    """Normalize spaces in all cells in text column of dataframe"""
+
+    df[text_column_name] = df[text_column_name].apply(
+        lambda x: re.sub('  +', ' ', x))
+    return df
+
+
+# ====================
+def normalize_unicode_string(string: str):
+
+    return (unicodedata.normalize('NFKD', string)
+            .encode('ascii', 'ignore').decode('utf8'))
+
+            
+# ====================
+def normalize_unicode(df, text_column_name='Text'):
+
+    df[text_column_name] = df[text_column_name].apply(normalize_unicode_string)
+    return df
+
+
+# ====================
+def show_prohibited_chars(df, prohibited_chars_re=r'[^A-Za-z0-9 \.,]',
+                          text_column_name='Text'):
+
+    prohibited_counter = Counter()
+    for _, row in df.iterrows():
+        text = row[text_column_name]
+        all_matches = re.findall(prohibited_chars_re, text)
+        if all_matches:
+            for match in all_matches:
+                prohibited_counter.update(match)
+
+    prohibited_total = sum(prohibited_counter.values())
+    prohibited_unique = set(prohibited_counter.keys())
+
+    print(f'Total of {prohibited_total} occurrences of',
+          f'{len(prohibited_unique)} prohibited characters',
+          'in dataframe.')
+    print('Most common (up to 10 displayed): ',
+          prohibited_counter.most_common(10))
