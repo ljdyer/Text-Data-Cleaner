@@ -85,13 +85,14 @@ def regex_replace(find_re, replace_re, df, text_column_name='Text',
 def normalize_spaces_string(string):
     """Normalize spaces in a string"""
 
+    return re.sub('  +', ' ', string)
+
 
 # ====================
 def normalize_spaces(df, text_column_name='Text'):
     """Normalize spaces in all cells in text column of a dataframe"""
 
-    df[text_column_name] = df[text_column_name].apply(
-        lambda x: re.sub('  +', ' ', x))
+    df[text_column_name] = df[text_column_name].apply(normalize_spaces_string)
     return df
 
 
