@@ -127,8 +127,8 @@ def replace_with_equivalent_chars(df, text_column_name='Text'):
         '“': '"',
         '…': '...'
     }
-    translation_table = str.maketrans(''.join(EQUIVALENTS.keys(),
-                                      ''.join(EQUIVALENTS.values())))
+    translation_table = str.maketrans(''.join(EQUIVALENTS.keys()),
+                                      ''.join(EQUIVALENTS.values()))
 
     df[text_column_name] = df[text_column_name].apply(
         lambda x: x.translate(translation_table))
