@@ -1,8 +1,10 @@
-import pandas as pd
-import re
 import html
+import re
+import string
 import unicodedata
 from collections import Counter
+
+import pandas as pd
 from IPython.display import HTML
 
 
@@ -97,11 +99,11 @@ def normalize_spaces(df, text_column_name='Text'):
 # ====================
 def normalize_unicode_string(string: str):
     """Normalize unicode characters (replace accented characters with their
-    non-accented equivalents & remove other non-ascii characters) in a string"""
+    non-accented equivalents & remove other non-ascii characters) in a
+    string"""
 
     return (unicodedata.normalize('NFKD', string)
             .encode('ascii', 'ignore').decode('utf8'))
-    print (unicodedata.normalize('NFKD', string).encode('ascii', 'ignore').decode('utf8'))
 
 
 # ====================
@@ -125,9 +127,9 @@ def replace_with_equivalent_chars(df, text_column_name='Text'):
         '“': '"',
         '…': '...'
     }
-    translation_table = maketrans(''.join(EQUIVALENTS.keys(),
-                                  ''.join(EQUIVALENTS.values())))
-    
+    translation_table = string.maketrans(''.join(EQUIVALENTS.keys(),
+                                         ''.join(EQUIVALENTS.values())))
+
     df[text_column_name] = df[text_column_name].apply(
         lambda x: x.translate(translation_table))
     return df
