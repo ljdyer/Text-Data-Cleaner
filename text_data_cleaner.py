@@ -25,7 +25,8 @@ def show_doc_and_word_counts(df, text_column_name='Text'):
 
 # ====================
 def preview_regex_replace(find_re, replace_re, df, text_column_name='Text',
-                          num_samples=10, chars_before_after=25):
+                          num_samples=10, chars_before_after=25,
+                          normalize_spaces=True):
     """Preview the effects of a regex replace operation before you apply it."""
 
     matches = []
@@ -44,6 +45,8 @@ def preview_regex_replace(find_re, replace_re, df, text_column_name='Text',
                     fr'({find_re})', r'<span style="color:red">\1</span>',
                     text_to_display
                 )
+                if normalize_spaces:
+                    text_to_display = normalize_spaces_string(text_to_display)
                 text_after = re.sub(
                     fr'({find_re})',
                     fr'<span style="color:green">{replace_re}</span>',
@@ -78,8 +81,13 @@ def regex_replace(find_re, replace_re, df, text_column_name='Text',
 
 
 # ====================
+def normalize_spaces_string(string):
+    """Normalize spaces in a string"""
+
+
+# ====================
 def normalize_spaces(df, text_column_name='Text'):
-    """Normalize spaces in all cells in text column of dataframe"""
+    """Normalize spaces in all cells in text column of a dataframe"""
 
     df[text_column_name] = df[text_column_name].apply(
         lambda x: re.sub('  +', ' ', x))
@@ -88,13 +96,19 @@ def normalize_spaces(df, text_column_name='Text'):
 
 # ====================
 def normalize_unicode_string(string: str):
+    """Normalize unicode characters (replace accented characters with their
+    non-accented equivalents & remove other non-ascii characters) in a string"""
 
     return (unicodedata.normalize('NFKD', string)
             .encode('ascii', 'ignore').decode('utf8'))
+    print (unicodedata.normalize('NFKD', string).encode('ascii', 'ignore').decode('utf8'))
 
-            
+
 # ====================
 def normalize_unicode(df, text_column_name='Text'):
+    """Normalize unicode characters (replace accented characters with their
+    non-accented equivalents & remove other non-ascii characters) in all cells
+    in text column of a dataframe"""
 
     df[text_column_name] = df[text_column_name].apply(normalize_unicode_string)
     return df
@@ -102,7 +116,7 @@ def normalize_unicode(df, text_column_name='Text'):
 
 # ====================
 def show_prohibited_chars(df, prohibited_chars_re=r'[^A-Za-z0-9 \.,]',
-                          text_column_name='Text'):
+                          text_column_name='Text', print_all=False):
 
     prohibited_counter = Counter()
     for _, row in df.iterrows():
@@ -118,5 +132,9 @@ def show_prohibited_chars(df, prohibited_chars_re=r'[^A-Za-z0-9 \.,]',
     print(f'Total of {prohibited_total} occurrences of',
           f'{len(prohibited_unique)} prohibited characters',
           'in dataframe.')
+    if print_all:
+        print(', '.join(prohibited_unique))
+    top_10 = ', '.join([f'{char} ({count})'
+                       for char, count in prohibited_counter.most_common(10)])
     print('Most common (up to 10 displayed): ',
-          prohibited_counter.most_common(10))
+          top_10)
