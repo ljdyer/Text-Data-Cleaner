@@ -43,14 +43,14 @@ def preview_regex_replace(find_re, replace_re, df, text_column_name='Text',
                 end_pos = min(match_end + chars_before_after, len(text))
                 text_to_display = html.escape(text[start_pos:end_pos])
                 text_before = re.sub(
-                    fr'({find_re})', r'<span style="color:red">\1</span>',
+                    f'({find_re})', r'<span style="color:red">\1</span>',
                     text_to_display
                 )
                 if norm_spaces:
                     text_to_display = normalize_spaces_string(text_to_display)
                 text_after = re.sub(
-                    fr'({find_re})',
-                    fr'<span style="color:green">{replace_re}</span>',
+                    f'({find_re})',
+                    f'<span style="color:green">{replace_re}</span>',
                     text_to_display
                 )
                 matches.append((index, f'{count}/{len(iter_matches)}',
