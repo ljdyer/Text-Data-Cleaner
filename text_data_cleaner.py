@@ -122,7 +122,6 @@ def replace_with_equivalent_chars(df, text_column_name='Text'):
         '’': "'",
         '‘': "'",
         'ʾ': "'",
-        '–': '-',
         '“': '"',
         '…': '...'
     }
