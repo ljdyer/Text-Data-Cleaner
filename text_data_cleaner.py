@@ -49,8 +49,8 @@ def preview_regex_replace(find_re, replace_re, df, text_column_name='Text',
                 if norm_spaces:
                     text_to_display = normalize_spaces_string(text_to_display)
                 text_after = re.sub(
-                    f'({find_re})',
-                    rf'<span style="color:green">{replace_re}</span>',
+                    f'{find_re}',
+                    f'<span style="color:green">{replace_re}</span>',
                     text_to_display
                 )
                 matches.append((index, f'{count+1}/{len(iter_matches)}',
