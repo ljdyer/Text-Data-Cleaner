@@ -50,10 +50,10 @@ def preview_regex_replace(find_re, replace_re, df, text_column_name='Text',
                     text_to_display = normalize_spaces_string(text_to_display)
                 text_after = re.sub(
                     f'({find_re})',
-                    f'<span style="color:green">{replace_re}</span>',
+                    rf'<span style="color:green">{replace_re}</span>',
                     text_to_display
                 )
-                matches.append((index, f'{count}/{len(iter_matches)}',
+                matches.append((index, f'{count+1}/{len(iter_matches)}',
                                 text_before, text_after))
 
     matches_df = pd.DataFrame(matches)
