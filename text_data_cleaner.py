@@ -115,6 +115,26 @@ def normalize_unicode(df, text_column_name='Text'):
 
 
 # ====================
+def replace_with_equivalent_chars(df, text_column_name='Text'):
+    """Replace special characters with equivalent ASCII characters."""
+
+    EQUIVALENTS = {
+        '’': "'",
+        '‘': "'",
+        'ʾ': "'"
+        '–': '-',
+        '“': '"',
+        '…': '...'
+    }
+    translation_table = maketrans(''.join(EQUIVALENTS.keys(),
+                                  ''.join(EQUIVALENTS.values())))
+    
+    df[text_column_name] = df[text_column_name].apply(
+        lambda x: x.translate(translation_table))
+    return df
+
+
+# ====================
 def show_prohibited_chars(df, prohibited_chars_re=r'[^A-Za-z0-9 \.,]',
                           text_column_name='Text', print_all=False):
 
