@@ -27,7 +27,7 @@ def show_doc_and_word_counts(df, text_column_name='Text'):
 # ====================
 def preview_regex_replace(find_re, replace_re, df, text_column_name='Text',
                           num_samples=10, chars_before_after=25,
-                          normalize_spaces=True):
+                          norm_spaces=True):
     """Preview the effects of a regex replace operation before you apply it."""
 
     matches = []
@@ -46,7 +46,7 @@ def preview_regex_replace(find_re, replace_re, df, text_column_name='Text',
                     fr'({find_re})', r'<span style="color:red">\1</span>',
                     text_to_display
                 )
-                if normalize_spaces:
+                if norm_spaces:
                     text_to_display = normalize_spaces_string(text_to_display)
                 text_after = re.sub(
                     fr'({find_re})',
@@ -69,13 +69,13 @@ def preview_regex_replace(find_re, replace_re, df, text_column_name='Text',
 
 # ====================
 def regex_replace(find_re, replace_re, df, text_column_name='Text',
-                  normalize_spaces=True):
+                  norm_spaces=True):
     """Perform a regex replace operation to all cells of text column of
     dataframe"""
 
     df[text_column_name] = df[text_column_name].apply(
         lambda x: re.sub(find_re, replace_re, x))
-    if normalize_spaces:
+    if norm_spaces:
         df = normalize_spaces(df)
 
     return df
