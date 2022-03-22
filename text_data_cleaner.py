@@ -7,9 +7,6 @@ from collections import Counter
 import pandas as pd
 from IPython.display import HTML
 
-# Hide chained assignment warning
-pd.options.mode.chained_assignment = None   # default='warn'
-
 
 # ====================
 def show_doc_and_word_counts(df, text_column_name='Text'):
