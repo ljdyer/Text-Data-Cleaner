@@ -8,9 +8,6 @@ import numpy as np
 from IPython.display import HTML
 
 
-# TODO: Remove num_words column before returning (DONE?)
-# TODO: Figure out dropping empty rows
-
 # === MAIN FUNCTIONS ===
 
 # ====================
@@ -97,7 +94,7 @@ def regex_replace(regex_list: list,
 
     # Normalize spaces
     if norm_spaces:
-        df = normalize_spaces(df)
+        df = normalize_spaces(df, text_column_name=text_column_name)
 
     # Drop empty rows
     if drop_empty_rows:
@@ -126,27 +123,6 @@ def normalize_unicode(df, text_column_name='Text'):
     in text column of a dataframe"""
 
     df[text_column_name] = df[text_column_name].apply(normalize_unicode_string)
-    return df
-
-
-# ====================
-def replace_with_equivalent_chars(df, text_column_name='Text'):
-    """Replace special characters with equivalent ASCII characters."""
-
-    EQUIVALENTS = {
-        '’': "'",
-        '‘': "'",
-        'ʾ': "'",
-        '“': '"',
-        '…': '...'
-    }
-
-    def replace_with_equivalents(string):
-        for find, replace in EQUIVALENTS.items():
-            string = string.replace(find, replace)
-
-    df[text_column_name] = df[text_column_name].apply(
-        replace_with_equivalents)
     return df
 
 
