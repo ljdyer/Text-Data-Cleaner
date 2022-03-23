@@ -4,6 +4,7 @@ import unicodedata
 from collections import Counter
 
 import pandas as pd
+import numpy as np
 from IPython.display import HTML
 
 
@@ -75,15 +76,22 @@ def preview_regex_replace(find_re, replace_re, df, text_column_name='Text',
 
 # ====================
 def regex_replace(find_re, replace_re, df, text_column_name='Text',
-                  norm_spaces=True):
+                  norm_spaces=True, drop_empty_rows=True):
     """Perform a regex replace operation to all cells of text column of
     dataframe"""
 
     df[text_column_name] = df[text_column_name].apply(
         lambda x: re.sub(find_re, replace_re, x))
+
+    # Normalize spaces
     if norm_spaces:
         df = normalize_spaces(df)
 
+    # Drop empty rows
+    if drop_empty_rows:
+        df = df[text_column_name].replace('', np.nan, inplace=True)
+        df = df.dropna(subset=[text_column_name], inplace=True)
+        
     print('Done.')
     show_doc_and_word_counts(df)
 
