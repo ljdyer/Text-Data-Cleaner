@@ -8,6 +8,9 @@ import numpy as np
 from IPython.display import HTML
 
 
+# TODO: Remove num_words column before returning (DONE?)
+# TODO: Figure out dropping empty rows
+
 # === MAIN FUNCTIONS ===
 
 # ====================
@@ -18,11 +21,12 @@ def show_doc_and_word_counts(df, text_column_name='Text'):
     Words are defined simply as consecutive chains of non-whitespace characters
     (because word tokenizing takes time)"""
 
+    df_ = df.copy()
     # Doc (word) count
-    num_docs_total = len(df)
+    num_docs_total = len(df_)
     # Word count
-    df['num_words'] = df[text_column_name].apply(lambda x: len(x.split()))
-    num_words_total = sum(df['num_words'])
+    df_['num_words'] = df_[text_column_name].apply(lambda x: len(x.split()))
+    num_words_total = sum(df_['num_words'])
 
     print(f'{num_words_total} words in {num_docs_total} documents (rows).')
 
@@ -90,6 +94,7 @@ def regex_replace(find_re, replace_re, df, text_column_name='Text',
     # Drop empty rows
     if drop_empty_rows:
         df[text_column_name].replace('', np.nan, inplace=True)
+        df[text_column_name].replace(' ', np.nan, inplace=True)
         df.dropna(subset=[text_column_name], inplace=True)
 
     print('Done.')
