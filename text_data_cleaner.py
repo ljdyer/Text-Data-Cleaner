@@ -30,6 +30,9 @@ def preview_regex_replace(find_re, replace_re, df, text_column_name='Text',
                           norm_spaces=True):
     """Preview the effects of a regex replace operation before you apply it."""
 
+    find_re = re.escape(find_re)
+    replace_re = re.escape(replace_re)
+
     matches = []
     num_docs_with_matches = 0
     for index, row in df.iterrows():
