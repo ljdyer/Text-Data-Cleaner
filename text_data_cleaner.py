@@ -103,7 +103,7 @@ def regex_replace(regex_list: list,
         df.dropna(subset=[text_column_name], inplace=True)
 
     print('Done.')
-    show_doc_and_word_counts(df)
+    show_doc_and_word_counts(df, text_column_name=text_column_name)
 
     return df
 
