@@ -7,6 +7,8 @@ import pandas as pd
 from IPython.display import HTML
 
 
+# === MAIN FUNCTIONS ===
+
 # ====================
 def show_doc_and_word_counts(df, text_column_name='Text'):
     """Show the number of documents (rows) and words in a text column of a
@@ -29,9 +31,6 @@ def preview_regex_replace(find_re, replace_re, df, text_column_name='Text',
                           num_samples=10, chars_before_after=25,
                           norm_spaces=True):
     """Preview the effects of a regex replace operation before you apply it."""
-
-    find_re = re.escape(find_re)
-    replace_re = re.escape(replace_re)
 
     matches = []
     num_docs_with_matches = 0
@@ -85,28 +84,11 @@ def regex_replace(find_re, replace_re, df, text_column_name='Text',
 
 
 # ====================
-def normalize_spaces_string(string):
-    """Normalize spaces in a string"""
-
-    return re.sub('  +', ' ', string)
-
-
-# ====================
 def normalize_spaces(df, text_column_name='Text'):
     """Normalize spaces in all cells in text column of a dataframe"""
 
     df[text_column_name] = df[text_column_name].apply(normalize_spaces_string)
     return df
-
-
-# ====================
-def normalize_unicode_string(string: str):
-    """Normalize unicode characters (replace accented characters with their
-    non-accented equivalents & remove other non-ascii characters) in a
-    string"""
-
-    return (unicodedata.normalize('NFKD', string)
-            .encode('ascii', 'ignore').decode('utf8'))
 
 
 # ====================
@@ -164,3 +146,25 @@ def show_prohibited_chars(df, prohibited_chars_re=r'[^A-Za-z0-9 \.,]',
                        for char, count in prohibited_counter.most_common(10)])
     print('Most common (up to 10 displayed): ',
           top_10)
+
+
+# === HELPER FUNCTIONS ===
+
+# ====================
+def normalize_spaces_string(string):
+    """Normalize spaces in a string"""
+
+    return re.sub('  +', ' ', string)
+
+
+# ====================
+def normalize_unicode_string(string: str):
+    """Normalize unicode characters (replace accented characters with their
+    non-accented equivalents & remove other non-ascii characters) in a
+    string"""
+
+    return (unicodedata.normalize('NFKD', string)
+            .encode('ascii', 'ignore').decode('utf8'))
+
+
+
