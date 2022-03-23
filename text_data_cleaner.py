@@ -58,6 +58,10 @@ def preview_regex_replace(find_re, replace_re, df, text_column_name='Text',
                 matches.append((index, f'{count+1}/{len(iter_matches)}',
                                 text_before, text_after))
 
+    if not matches:
+        print('No matches found!')
+        return
+
     matches_df = pd.DataFrame(matches)
     matches_df.columns = ['Row index', 'Match number', 'Before', 'After']
     pd.set_option('display.max_colwidth', None)
@@ -79,6 +83,9 @@ def regex_replace(find_re, replace_re, df, text_column_name='Text',
         lambda x: re.sub(find_re, replace_re, x))
     if norm_spaces:
         df = normalize_spaces(df)
+
+    print('Done.')
+    show_doc_and_word_counts(df)
 
     return df
 
