@@ -48,18 +48,22 @@ def preview_regex_replace(find_re, replace_re, df, text_column_name='Text',
                 match_start, match_end = match.span()
                 start_pos = max(0, match_start-chars_before_after)
                 end_pos = min(match_end + chars_before_after, len(text))
-                text_to_display = html.escape(text[start_pos:end_pos])
+                text_to_display = html.escape(text[start_pos:end_pos],
+                                              quote=False)
                 text_before = re.sub(
-                    f'({find_re})', r'<span style="color:red">\1</span>',
+                    f"({find_re})",
+                    r'<span style="color:red">\1</span>',
+                    text_to_display
+                )
+
+                text_after = re.sub(
+                    find_re,
+                    rf'<span style="color:green">{replace_re}</span>',
                     text_to_display
                 )
                 if norm_spaces:
-                    text_to_display = normalize_spaces_string(text_to_display)
-                text_after = re.sub(
-                    f'{find_re}',
-                    f'<span style="color:green">{replace_re}</span>',
-                    text_to_display
-                )
+                    text_after = normalize_spaces_string(text_after)
+
                 matches.append((index, f'{count+1}/{len(iter_matches)}',
                                 text_before, text_after))
 
@@ -70,7 +74,7 @@ def preview_regex_replace(find_re, replace_re, df, text_column_name='Text',
     matches_df = pd.DataFrame(matches)
     matches_df.columns = ['Row index', 'Match number', 'Before', 'After']
     pd.set_option('display.max_colwidth', None)
-    display(HTML(matches_df.sample(n=num_samples)
+    display(HTML(matches_df.sample(n=min(len(matches_df), num_samples))
                  .to_html(escape=False, index=False)))
     pd.set_option('display.max_colwidth', 50)
 
@@ -79,13 +83,17 @@ def preview_regex_replace(find_re, replace_re, df, text_column_name='Text',
 
 
 # ====================
-def regex_replace(find_re, replace_re, df, text_column_name='Text',
-                  norm_spaces=True, drop_empty_rows=True):
+def regex_replace(regex_list: list,
+                  df: pd.DataFrame,
+                  text_column_name: str = 'Text',
+                  norm_spaces: bool = True,
+                  drop_empty_rows: bool = True):
     """Perform a regex replace operation to all cells of text column of
     dataframe"""
 
-    df[text_column_name] = df[text_column_name].apply(
-        lambda x: re.sub(find_re, replace_re, x))
+    for find_re, replace_re in regex_list:
+        df[text_column_name] = df[text_column_name].apply(
+            lambda x: re.sub(find_re, replace_re, x))
 
     # Normalize spaces
     if norm_spaces:
@@ -185,6 +193,3 @@ def normalize_unicode_string(string: str):
 
     return (unicodedata.normalize('NFKD', string)
             .encode('ascii', 'ignore').decode('utf8'))
-
-
-
