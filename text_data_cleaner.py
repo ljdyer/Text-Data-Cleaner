@@ -89,9 +89,9 @@ def regex_replace(find_re, replace_re, df, text_column_name='Text',
 
     # Drop empty rows
     if drop_empty_rows:
-        df = df[text_column_name].replace('', np.nan, inplace=True)
+        df[text_column_name] = df[text_column_name].replace('', np.nan, inplace=True)
         df = df.dropna(subset=[text_column_name], inplace=True)
-        
+
     print('Done.')
     show_doc_and_word_counts(df)
 
