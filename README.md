@@ -4,7 +4,7 @@ Helper functions for cleaning text data in a pandas dataframe in Google Colab.
 
 ## How to use
 
-The recommended method for including `text_data_cleaner` in a workbook in Google Colab is:
+The recommended method to save and import the `text_data_cleaner` module into a Google Colab notebook is:
 
 ```python
 url = 'https://raw.githubusercontent.com/ljdyer/text-data-cleaner/main/text_data_cleaner.py'
@@ -19,6 +19,8 @@ from text_data_cleaner import *
 You may find that changes are not reflected when new versions are released. This can usually be resolved by selecting "Runtime" > "Reset factory runtime" in the Google Colab menu. Check the version you are using by running `help(text_data_cleaner)`.
 
 ## Functions
+
+The example usage screenshots in this section are from a project where I had to reduce text data from transcripts of TED Talks to leave only the characters a-z, A-Z, 0-9, space, comma, and period. You can see the full notebook [here](clean_ted_talks.ipynb).
 
 ### show_doc_and_word_counts
 
@@ -43,6 +45,10 @@ def show_doc_and_word_counts(df: pd.DataFrame,
                                         dataframe
     """
 ```
+
+Example usage: 
+
+<img src="readme-img/show_word_and_doc_counts.PNG"></img>
 
 ### show_prohibited_chars
 
@@ -72,6 +78,10 @@ def show_prohibited_chars(df: pd.DataFrame,
                                         text column
     """
 ```
+
+Example usage: 
+
+<img src="readme-img/show_prohibited_chars.PNG"></img>
 
 ### preview_regex_replace
 
@@ -108,6 +118,10 @@ def preview_regex_replace(find_re: str,
     """
 ```
 
+Example usage:
+
+<img src="readme-img/preview_regex_replace.PNG"></img>
+
 ### regex_replace
 
 ```python
@@ -137,7 +151,11 @@ def regex_replace(regex_list: list,
                                         strings following replacement
     """
 ```
-   
+
+Example usage:
+
+<img src="readme-img/regex_replace.PNG"></img>
+
 ### normalize_unicode
 
 ```python
@@ -159,3 +177,7 @@ def normalize_unicode(df: pd.DataFrame,
                                         dataframe
     """
 ```
+
+Example usage:
+
+<img src="readme-img/normalize_unicode.PNG"></img>

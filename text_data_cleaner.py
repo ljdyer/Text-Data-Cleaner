@@ -238,8 +238,6 @@ def normalize_unicode(df: pd.DataFrame,
 # === HELPER FUNCTIONS ===
 
 # ====================
-
-# ====================
 def get_context_str(text: str,
                     match: re.Match,
                     context_chars_before_after: int
