@@ -1,20 +1,20 @@
-# """
-# text_data_cleaner.py
-# https://github.com/ljdyer/text-data-cleaner
-# Version number: 0.0.0.1
+"""
+text_data_cleaner.py
+https://github.com/ljdyer/text-data-cleaner
+Version number: 0.0.0.1
 
-# Helper functions for cleaning text data in a pandas dataframe.
+Helper functions for cleaning text data in a pandas dataframe.
 
-# FUNCTIONS
+FUNCTIONS
 
-#     show_doc_and_word_counts
-#     preview_regex_replace
-#     regex_replace
-#     normalize_unicode
-#     show_prohibited_chars
+    show_doc_and_word_counts
+    preview_regex_replace
+    regex_replace
+    normalize_unicode
+    show_prohibited_chars
 
-# Type help(function_name) for help on each function.
-# """
+Type help(function_name) for help on each function.
+"""
 
 __all__ = [
     'show_doc_and_word_counts',
@@ -308,6 +308,7 @@ def color_replacements_green(find_re: str,
 def normalize_spaces(df: pd.DataFrame,
                      text_column_name='Text'
                      ) -> pd.DataFrame:
+
     """Normalize spaces in all cells in text column of a dataframe"""
 
     df[text_column_name] = df[text_column_name].apply(normalize_spaces_string)
@@ -316,6 +317,7 @@ def normalize_spaces(df: pd.DataFrame,
 
 # ====================
 def normalize_spaces_string(input_str: str) -> str:
+
     """Normalize spaces in a string"""
 
     return re.sub('  +', ' ', input_str)
@@ -323,6 +325,7 @@ def normalize_spaces_string(input_str: str) -> str:
 
 # ====================
 def normalize_unicode_string(input_str: str) -> str:
+
     """Normalize unicode characters (replace accented characters with their
     non-accented equivalents & remove other non-ascii characters) in a
     string"""
