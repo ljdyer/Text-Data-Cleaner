@@ -38,7 +38,7 @@ def show_doc_and_word_counts(df: pd.DataFrame,
 
     Required arguments:
     -------------------
-    df: pd.DataFrame    A dataframe with a text column
+    df: pd.DataFrame                    A dataframe with a text column
 
     Optional keyword arguments:
     ---------------------------
@@ -66,7 +66,7 @@ def show_prohibited_chars(df: pd.DataFrame,
 
     Required arguments:
     -------------------
-    df: pd.DataFrame    A dataframe with a text column
+    df: pd.DataFrame                    A dataframe with a text column
 
     Optional keyword arguments:
     ---------------------------
@@ -116,9 +116,9 @@ def preview_regex_replace(find_re: str,
 
     Required arguments:
     -------------------
-    find_re             The regex to find e.g. r'\((\w)\)'
-    replace_re          The regex to replace it with e.g. r'\1'
-    df: pd.DataFrame    A dataframe with a text column
+    find_re: str                        The regex to find e.g. r'\((\w)\)'
+    replace_re: str                     The regex to replace it with e.g. r'\1'
+    df: pd.DataFrame                    A dataframe with a text column
 
     Optional keyword arguments:
     ---------------------------
@@ -178,9 +178,9 @@ def regex_replace(regex_list: list,
 
     Required arguments:
     -------------------
-    regex_list: list    A list of (find, replace) tuples
-                        e.g. (r'\(\w+\)', r'')
-    df: pd.DataFrame    A dataframe with a text column
+    regex_list: list                    A list of (find, replace) tuples
+                                        e.g. (r'\(\w+\)', r'')
+    df: pd.DataFrame                    A dataframe with a text column
 
     Optional keyword arguments:
     ---------------------------
@@ -223,7 +223,7 @@ def normalize_unicode(df: pd.DataFrame,
 
     Required arguments:
     -------------------
-    df: pd.DataFrame    A dataframe with a text column
+    df: pd.DataFrame                    A dataframe with a text column
 
     Optional keyword arguments:
     ---------------------------
