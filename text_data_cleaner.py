@@ -1,19 +1,9 @@
 """
 text_data_cleaner.py
 https://github.com/ljdyer/text-data-cleaner
-Version number: 0.0.0.1
+Version number: 0.0.0.2
 
 Helper functions for cleaning text data in a pandas dataframe.
-
-FUNCTIONS
-
-    show_doc_and_word_counts
-    preview_regex_replace
-    regex_replace
-    normalize_unicode
-    show_prohibited_chars
-
-Type help(function_name) for help on each function.
 """
 
 __all__ = [
@@ -73,7 +63,7 @@ def preview_regex_replace(find_re: str,
                           context_chars_before_after: int = 25,
                           norm_spaces: bool = True):
 
-    """Preview the effects of a regex replace operation on your dataframe
+    r"""Preview the effects of a regex replace operation on your dataframe
     before you apply it.
 
     Required arguments:
