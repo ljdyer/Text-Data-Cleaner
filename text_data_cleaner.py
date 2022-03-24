@@ -315,7 +315,7 @@ def normalize_spaces(df: pd.DataFrame,
 
 
 # ====================
-def normalize_spaces_string(input_str):
+def normalize_spaces_string(input_str: str) -> str:
     """Normalize spaces in a string"""
 
     return re.sub('  +', ' ', input_str)
