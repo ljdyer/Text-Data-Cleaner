@@ -9,7 +9,11 @@ The recommended method to save and import the `text_data_cleaner` module into a 
 ```python
 url = 'https://raw.githubusercontent.com/ljdyer/text-data-cleaner/main/text_data_cleaner.py'
 !wget --no-cache -backups=1 'text_data_cleaner.py' {url}
+```
 
+Then (in a separate cell):
+
+```python
 import text_data_cleaner
 from text_data_cleaner import *
 ```
