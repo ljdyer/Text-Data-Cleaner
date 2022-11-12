@@ -1,1 +1,1 @@
-from text_data_cleaner import TextDataCleaner   # noqa F401
+from text_data_cleaner.text_data_cleaner import TextDataCleaner   # noqa F401
