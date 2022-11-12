@@ -22,55 +22,39 @@ class TextDataCleaner:
     
         num_docs = len(self.texts_latest)
         num_words = sum(self.texts_latest.apply(lambda x: len(x.split())))
-        print(f'{num_words} words in {num_docs} documents (rows).')
+        print(f'{num_words} words in {num_docs} documents.')
 
+    # ====================
+    def show_prohibited_chars(self,
+                              prohibited_chars: str = None):
+                            
+        if prohibited_chars is not None:
+            self.prohibited_chars = prohibited_chars
+        else:
+            if not hasattr(self, 'prohibited_chars'):
+                raise ValueError(
+                    "Prohibited characters have not been specified. " + \
+                    "Call the method again with the prohibited_chars parameter."
+                )
 
-# # ====================
-# def show_prohibited_chars(df: pd.DataFrame,
-#                           prohibited_chars_re: str = r'[^A-Za-z0-9 \.,]',
-#                           text_column_name='Text',
-#                           print_all=False
-#                           ) -> pd.DataFrame:
+        prohibited_counter = Counter()
+        texts_list = self.texts_latest.to_list()
+        for text in texts_list:
+            all_matches = re.findall(prohibited_chars, text)
+            if all_matches:
+                for match in all_matches:
+                    prohibited_counter.update(match)
 
-#     """Print information about the occurrence of prohibited characters in the
-#     text column of your dataframe
+        prohibited_total = sum(prohibited_counter.values())
+        prohibited_unique = set(prohibited_counter.keys())
 
-#     Required arguments:
-#     -------------------
-#     df: pd.DataFrame                    A dataframe with a text column
-
-#     Optional keyword arguments:
-#     ---------------------------
-#     prohibited_chars_re: str = r'[^A-Za-z0-9 \.,]'
-#                                         A regex that matches prohibited
-#                                         characters
-#     text_column_name: str = 'Text'      The name of the text column in the
-#                                         dataframe
-#     print_all: bool = False             If True, prints a list of all of the
-#                                         (unique) prohibited characters in the
-#                                         text column
-#     """
-
-#     prohibited_counter = Counter()
-#     for _, row in df.iterrows():
-#         text = row[text_column_name]
-#         all_matches = re.findall(prohibited_chars_re, text)
-#         if all_matches:
-#             for match in all_matches:
-#                 prohibited_counter.update(match)
-
-#     prohibited_total = sum(prohibited_counter.values())
-#     prohibited_unique = set(prohibited_counter.keys())
-
-#     print(f'Total of {prohibited_total} occurrences of',
-#           f'{len(prohibited_unique)} prohibited characters',
-#           'in dataframe.')
-#     if print_all:
-#         print(', '.join(prohibited_unique))
-#     top_10 = ', '.join([f'{char} ({count})'
-#                        for char, count in prohibited_counter.most_common(10)])
-#     print('Most common (up to 10 displayed): ',
-#           top_10)
+        print(f'Total of {prohibited_total} occurrences of',
+              f'{len(prohibited_unique)} prohibited characters',
+              'in dataframe.')
+        print(', '.join(prohibited_unique))
+        top_10 = ', '.join([f'{char} ({count})'
+                            for char, count in prohibited_counter.most_common(10)])
+        print('Most common (up to 10 displayed): ', top_10)
 
 
 # # ====================
