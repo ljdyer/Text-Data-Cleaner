@@ -56,68 +56,46 @@ class TextDataCleaner:
                             for char, count in prohibited_counter.most_common(10)])
         print('Most common (up to 10 displayed): ', top_10)
 
+    # ====================
+    def preview_replace(self,
+                        find_re: str,
+                        replace_re: str,
+                        num_samples: int = 10,
+                        context_chars_before_after: int = 25,
+                        normalize_spaces: bool = True):
 
-# # ====================
-# def preview_regex_replace(find_re: str,
-#                           replace_re: str,
-#                           df: pd.DataFrame,
-#                           text_column_name: str = 'Text',
-#                           num_samples: int = 10,
-#                           context_chars_before_after: int = 25,
-#                           norm_spaces: bool = True):
-
-#     r"""Preview the effects of a regex replace operation on your dataframe
-#     before you apply it.
-
-#     Required arguments:
-#     -------------------
-#     find_re: str                        The regex to find e.g. r'\((\w)\)'
-#     replace_re: str                     The regex to replace it with e.g. r'\1'
-#     df: pd.DataFrame                    A dataframe with a text column
-
-#     Optional keyword arguments:
-#     ---------------------------
-#     text_column_name: str = 'Text'      The name of the text column in the
-#                                         dataframe
-#     num_samples: int = 10               The number of example replacements to
-#                                         display
-#     context_chars_before_after: int = 25
-#                                         The number of characters to display
-#                                         before and after the match in each
-#                                         example
-#     norm_spaces: bool = True,           If True, normalizes spaces after
-#                                         performing replacement
-#     """
-
-#     matches = []
-#     num_docs_with_matches = 0
-#     for index, row in df.iterrows():
-#         text = row[text_column_name]
-#         iter_matches = list(re.finditer(find_re, text))
-#         if iter_matches:
-#             num_docs_with_matches += 1
-#             for count, match in enumerate(iter_matches):
-#                 context_str = get_context_str(text, match,
-#                                               context_chars_before_after)
-#                 text_before = color_matches_red(find_re, context_str)
-#                 text_after = color_replacements_green(find_re, replace_re,
-#                                                       context_str, norm_spaces)
-#                 match_number = f'{count+1}/{len(iter_matches)}'
-#                 matches.append((index, match_number, text_before, text_after))
-
-#     if not matches:
-#         print('No matches found!')
-#         return
-
-#     matches_df = pd.DataFrame(
-#         matches, columns=['Row index', 'Match number', 'Before', 'After'])
-#     pd.set_option('display.max_colwidth', None)
-#     display(HTML(matches_df.sample(n=min(len(matches_df), num_samples))
-#                  .to_html(escape=False, index=False)))
-#     pd.set_option('display.max_colwidth', 50)
-
-#     print(f'Total of {len(matches)} matches in {num_docs_with_matches}',
-#           'documents (rows).')
+        matches = []
+        num_docs_with_matches = 0
+        texts_list = self.texts_latest.to_list()
+        for index, text in enumerate(texts_list):
+            iter_matches = list(re.finditer(find_re, text))
+            if iter_matches:
+                num_docs_with_matches += 1
+                for count, match in enumerate(iter_matches):
+                    context_str = get_context_str(
+                        text, match, context_chars_before_after)
+                    text_before = color_matches_red(
+                        find_re, context_str)
+                    text_after = color_replacements_green(
+                        find_re, replace_re, context_str, normalize_spaces)
+                    match_number = f'{count+1}/{len(iter_matches)}'
+                    matches.append((index, match_number, text_before, text_after))
+        if not matches:
+            print('No matches found!')
+            return
+        matches_df = pd.DataFrame(
+            matches, columns=['Doc index', 'Match number', 'Before', 'After'])
+        pd.set_option('display.max_colwidth', None)
+        display(
+            HTML(
+                matches_df.sample(
+                    n=min(len(matches_df), num_samples)
+                ).to_html(escape=False, index=False)
+            )
+        )
+        pd.set_option('display.max_colwidth', 50)
+        print(f'Total of {len(matches)} matches in {num_docs_with_matches}',
+            'documents (rows).')
 
 
 # # ====================
@@ -192,86 +170,74 @@ class TextDataCleaner:
 
 # # === HELPER FUNCTIONS ===
 
-# # ====================
-# def get_context_str(text: str,
-#                     match: re.Match,
-#                     context_chars_before_after: int
-#                     ) -> str:
+# ====================
+def get_context_str(text: str,
+                    match: re.Match,
+                    context_chars_before_after: int) -> str:
+    """Return a substring showing the context of a regex match in a string"""
 
-#     """Return a substring showing the context of a regex match in a string"""
-
-#     match_start, match_end = match.span()
-
-#     start_pos = max(0, match_start-context_chars_before_after)
-#     ellipsis_before = '...' if start_pos > 0 else ''
-
-#     end_pos = min(match_end+context_chars_before_after, len(text))
-#     ellipsis_after = '...' if end_pos < len(text) else ''
-
-#     return ellipsis_before + text[start_pos:end_pos] + ellipsis_after
+    match_start, match_end = match.span()
+    start_pos = max(0, match_start-context_chars_before_after)
+    ellipsis_before = '...' if start_pos > 0 else ''
+    end_pos = min(match_end+context_chars_before_after, len(text))
+    ellipsis_after = '...' if end_pos < len(text) else ''
+    return ellipsis_before + text[start_pos:end_pos] + ellipsis_after
 
 
-# # ====================
-# def color_matches_red(find_re: str,
-#                       input_str: str
-#                       ) -> str:
+# ====================
+def color_matches_red(find_re: str, input_str: str) -> str:
+    """Return an HTML string in which all instances of the regex in the string
+    are colored red"""
 
-#     """Return an HTML string in which all instances of the regex in the string
-#     are colored red"""
+    colored = re.sub(f"({find_re})", r'RED_START\1COLOR_END', input_str)
+    colored = html.escape(colored)
+    colored = colored.replace('RED_START', '<span style="color:red">')
+    colored = colored.replace('COLOR_END', '</span>')
+    return colored
 
-#     colored = re.sub(f"({find_re})", r'RED_START\1COLOR_END', input_str)
-#     colored = html.escape(colored)
-#     colored = colored.replace('RED_START', '<span style="color:red">')
-#     colored = colored.replace('COLOR_END', '</span>')
+# ====================
+def color_replacements_green(find_re: str,
+                             replace_re: str,
+                             input_str: str,
+                             norm_spaces: bool
+                             ) -> str:
+    """Perform a regex find and replace operation on an HTML string in which all of
+    the replaced parts are colored green"""
 
-#     return colored
-
-
-# # ====================
-# def color_replacements_green(find_re: str,
-#                              replace_re: str,
-#                              input_str: str,
-#                              norm_spaces: bool
-#                              ) -> str:
-
-#     """Perform a regex find and replace operation on an HTML string in which all of
-#     the replaced parts are colored green"""
-
-#     colored = re.sub(find_re, rf'GREEN_START{replace_re}COLOR_END', input_str)
-#     if norm_spaces:
-#         colored = normalize_spaces_string(colored)
-#     colored = html.escape(colored)
-#     colored = colored.replace('GREEN_START', '<span style="color:green">')
-#     colored = colored.replace('COLOR_END', '</span>')
-
-#     return colored
+    colored = re.sub(find_re, rf'GREEN_START{replace_re}COLOR_END', input_str)
+    if norm_spaces:
+        colored = normalize_spaces_string(colored)
+    colored = html.escape(colored)
+    colored = colored.replace('GREEN_START', '<span style="color:green">')
+    colored = colored.replace('COLOR_END', '</span>')
+    return colored
 
 
-# # ====================
-# def normalize_spaces(df: pd.DataFrame,
-#                      text_column_name='Text'
-#                      ) -> pd.DataFrame:
+# ====================
+def normalize_spaces(df: pd.DataFrame,
+                     text_column_name='Text'
+                     ) -> pd.DataFrame:
 
-#     """Normalize spaces in all cells in text column of a dataframe"""
+    """Normalize spaces in all cells in text column of a dataframe"""
 
-#     df[text_column_name] = df[text_column_name].apply(normalize_spaces_string)
-#     return df
-
-
-# # ====================
-# def normalize_spaces_string(input_str: str) -> str:
-
-#     """Normalize spaces in a string"""
-
-#     return re.sub('  +', ' ', input_str)
+    df[text_column_name] = df[text_column_name].apply(normalize_spaces_string)
+    return df
 
 
-# # ====================
-# def normalize_unicode_string(input_str: str) -> str:
+# ====================
+def normalize_spaces_string(input_str: str) -> str:
 
-#     """Normalize unicode characters (replace accented characters with their
-#     non-accented equivalents & remove other non-ascii characters) in a
-#     string"""
+    """Normalize spaces in a string"""
 
-#     return (unicodedata.normalize('NFKD', input_str)
-#             .encode('ascii', 'ignore').decode('utf8'))
+    return re.sub('  +', ' ', input_str)
+
+
+# ====================
+def normalize_unicode_string(input_str: str) -> str:
+
+    """Normalize unicode characters (replace accented characters with their
+    non-accented equivalents & remove other non-ascii characters) in a
+    string"""
+
+    return (unicodedata.normalize('NFKD', input_str)
+            .encode('ascii', 'ignore').decode('utf8'))
