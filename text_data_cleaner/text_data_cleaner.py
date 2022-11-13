@@ -175,7 +175,7 @@ class TextDataCleaner:
                 "contained only spaces following the operations."
             )
         print('Done.')
-        self.operation_history.update(find_replace)
+        self.operation_history.extend(find_replace)
         print()
         print('Latest counts:')
         self.show_counts()
