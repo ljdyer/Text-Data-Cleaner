@@ -27,7 +27,7 @@ NAMED_OPERATIONS = {
 
 
 
-get_ipython().events.register('pre_run_cell', wrap_output)
+# get_ipython().events.register('pre_run_cell', wrap_output)
 
 
 # ====================
@@ -76,12 +76,12 @@ class TextDataCleaner:
             print('Total number of tokens:', num_tokens)
             print('Total number of characters:', num_chars)
         else:
-            display_html(f'Number of documents: {num_docs} ' +
-                         f'({show_change_(docs_before, num_docs)})')
-            display_html(f'Total number of tokens: {num_tokens} ' +
-                         f'({show_change_(tokens_before, num_tokens)})')
-            display_html(f'Total number of characters: {num_chars} ' +
-                         f'({show_change_(chars_before, num_chars)})')
+            display_html_pre(f'Number of documents: {num_docs} ' +
+                             f'({show_change_(docs_before, num_docs)})')
+            display_html_pre(f'Total number of tokens: {num_tokens} ' +
+                             f'({show_change_(tokens_before, num_tokens)})')
+            display_html_pre(f'Total number of characters: {num_chars} ' +
+                             f'({show_change_(chars_before, num_chars)})')
         self.num_docs = num_docs
         self.num_tokens = num_tokens
         self.num_chars = num_chars
