@@ -88,8 +88,7 @@ class TextDataCleaner:
         for doc_idx, matches in enumerate(matches_by_doc):
             for match_idx, match in enumerate(matches):
                 context_str = get_context_str(
-                    docs[doc_idx], match, context_chars_before_after),
-                assert isinstance(context_str, str)
+                    docs[doc_idx], match, context_chars_before_after)
                 matches_all.append(
                     {
                         'Document index': doc_idx,
@@ -198,11 +197,6 @@ def get_context_str(text: str,
     ellipsis_before = '...' if start_pos > 0 else ''
     end_pos = min(match_end+context_chars_before_after, len(text))
     ellipsis_after = '...' if end_pos < len(text) else ''
-    print(
-        ellipsis_before,
-        text[start_pos:end_pos],
-        ellipsis_after
-    )
     return ellipsis_before + text[start_pos:end_pos] + ellipsis_after
 
 
@@ -211,12 +205,7 @@ def color_matches_red(find_re: str, input_str: str) -> str:
     """Return an HTML string in which all instances of the regex in the string
     are colored red"""
 
-    print(type(input_str))
-    try:
-        colored = re.sub(f"({find_re})", r'RED_START\1COLOR_END', input_str)
-    except:
-        print(find_re, input_str)
-
+    colored = re.sub(f"({find_re})", r'RED_START\1COLOR_END', input_str)
     colored = html.escape(colored)
     colored = colored.replace('RED_START', '<span style="color:red">')
     colored = colored.replace('COLOR_END', '</span>')
