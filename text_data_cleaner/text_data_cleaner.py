@@ -3,13 +3,12 @@ import random
 import re
 import unicodedata
 from collections import Counter
-from contextlib import contextmanager
-from typing import List, Tuple, Union, Any
-import pickle
-import urllib.request
+from typing import List, Optional, Tuple, Union
 
 import pandas as pd
-from IPython.display import HTML, display
+from helper import (display_html, display_html_pre, display_text_wrapped,
+                    get_context_after, get_context_before, load_pickle,
+                    pandas_options, save_pickle, show_change_)
 
 PREVIEW_BEFORE = """\
 <pre>{ellipsis_before}{text_before}\
@@ -23,8 +22,6 @@ PREVIEW_AFTER = """\
 NAMED_OPERATIONS = {
     'NORMALIZE-UNICODE-TO-ASCII': 'Normalize unicode to ASCII'
 }
-
-WRAP_PRE = "<style>pre {white-space: pre-wrap;}</style>"
 
 
 # ====================
@@ -48,7 +45,7 @@ class TextDataCleaner:
             docs = docs.to_list()
         self.docs_original = docs
         self.docs_latest = docs
-        self.operation_history = []
+        self.operation_history: List[Union[Tuple, str]] = []
         self.normalize_spaces = normalize_spaces
         print("Initialized.")
         print()
@@ -102,11 +99,11 @@ class TextDataCleaner:
 
     # ====================
     def show_unwanted_chars(self,
-                            unwanted_chars: str = None):
+                            unwanted_chars: Optional[str] = None):
         """Show unwanted characters in the latest version of the dataset
 
         Args:
-          unwanted_chars (str, optional):
+          unwanted_chars (Optional[str], optional):
             A regular expression that matches unwanted characters.
             E.g. r'[^A-Za-z0-9 \.,]'      # noqa: W605
             if you only want alphanumeric characters, spaces, periods,
@@ -181,7 +178,7 @@ class TextDataCleaner:
         Args:
           pickle_path (str):
             Path or URL to the pickle file containing the operation history
-        """        
+        """
 
         self.operation_history = load_pickle(pickle_path)
         self.refresh_latest_docs()
@@ -192,9 +189,9 @@ class TextDataCleaner:
         history by applying all operations in the history to the original
         dataset from scratch.
 
-        Should be carried out after making any direct changes to the 
+        Should be carried out after making any direct changes to the
         operation_history attribute of an instance.
-        """        
+        """
 
         self.docs_latest = self.docs_original
         print('Original docs')
@@ -303,11 +300,11 @@ class TextDataCleaner:
               "apply_last_previewed method.")
 
     # ====================
-    def apply_last_previewed(self, note: str = None):
+    def apply_last_previewed(self, note: Optional[str] = None):
         """Apply the most recently previewed replacement operation.
 
         Args:
-          note (str, optional):
+          note (Optional[str], optional):
             A note to describe the replacement operation to display
             when viewing the operation history. Defaults to None.
         """
@@ -368,7 +365,7 @@ class TextDataCleaner:
                                  replace: str,
                                  match: re.Match,
                                  context_chars_before_after: int
-                                 ) -> Tuple[str]:
+                                 ) -> Tuple[str, str]:
 
         match_start, match_end = match.span()
         match_str = doc[match_start:match_end]
@@ -414,7 +411,8 @@ class TextDataCleaner:
 
     # ====================
     def normalize_unicode_to_ascii(self):
-        """Normalize all unicode characters in the dataset to the ASCII equivalents.
+        """Normalize all unicode characters in the dataset to their ASCII
+        equivalents.
 
         Replaces accented characters with their non-accented equivalents and
         removes other non-ASCII characters.
@@ -426,88 +424,3 @@ class TextDataCleaner:
             for doc in self.docs_latest
         ]
         self.operation_history.append('NORMALIZE-UNICODE-TO-ASCII')
-
-
-# # === HELPER FUNCTIONS ===
-
-# ====================
-def get_context_before(text: str,
-                       context_len: int) -> Tuple[str, str]:
-
-    ellipsis = '... ' if len(text) > context_len else '    '
-    context = text[-context_len:].rjust(context_len)
-    return ellipsis, context
-
-
-# ====================
-def get_context_after(text: str,
-                      context_len: int) -> Tuple[str, str]:
-
-    ellipsis = ' ...' if len(text) > context_len else '    '
-    context = text[:context_len].ljust(context_len)
-    return ellipsis, context
-
-
-# ====================
-def show_change_(before, after):
-
-    if before > after:
-        return f'<span style="color:green">↓ {before-after}</span>'
-    elif after < before:
-        return f'<span style="color:red">↑ {after-before}</span>'
-    else:
-        return 'no change'
-
-
-# ====================
-def display_html(content: str):
-
-    display(HTML(content))
-
-
-# ====================
-def display_html_pre(content: str):
-
-    display_html(f"<pre>{content}</pre>")
-
-
-# ====================
-def display_text_wrapped(content: str):
-
-    content = html.escape(content)
-    display_html(WRAP_PRE + f"<pre>{content}</pre>")
-
-
-# ====================
-def save_pickle(data: Any, fp: str):
-    """Save data to a .pickle file"""
-
-    with open(fp, 'wb') as f:
-        pickle.dump(data, f)
-
-
-# ====================
-def load_pickle(fp: str) -> Any:
-    """Load a .pickle file and return the data"""
-
-    if 'http' in fp:
-        with(urllib.request.urlopen(fp)) as f:
-            unpickled = pickle.load(f)    
-    else:
-        with open(fp, 'rb') as f:
-            unpickled = pickle.load(f)
-    return unpickled
-
-
-# # === CONTEXT MANAGERS ===
-
-# =====
-@contextmanager
-def pandas_options(options: List[Tuple]):
-
-    before = [pd.get_option(option_name) for option_name, _ in options]
-    for option in options:
-        pd.set_option(*option)
-    yield
-    for option_idx, option in enumerate(options):
-        pd.set_option(option[0], before[option_idx])
