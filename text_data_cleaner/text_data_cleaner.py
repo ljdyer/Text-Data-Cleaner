@@ -89,7 +89,7 @@ class TextDataCleaner:
             for match_idx, match in enumerate(matches):
                 context_str = get_context_str(
                     docs[doc_idx], match, context_chars_before_after),
-                matches_all.update(
+                matches_all.append(
                     {
                         'Document index': doc_idx,
                         'Match number': f"{match_idx+1} of {len(matches)}",
