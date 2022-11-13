@@ -42,35 +42,37 @@ class TextDataCleaner:
         print('Total number of characters: ', num_chars)
 
     # ====================
-    def show_prohibited_chars(self,
-                              prohibited_chars: str = None):
+    def show_unwanted_chars(self,
+                            unwanted_chars: str = None):
                             
-        if prohibited_chars is not None:
-            self.prohibited_chars = prohibited_chars
+        if unwanted_chars is not None:
+            self.unwanted_chars = unwanted_chars
         else:
-            if not hasattr(self, 'prohibited_chars'):
+            if not hasattr(self, 'unwanted_chars'):
                 raise ValueError(
-                    "Prohibited characters have not been specified. " + \
-                    "Call the method again with the prohibited_chars parameter."
+                    "unwanted characters have not been specified. " + \
+                    "Call the method again with the unwanted_chars parameter."
                 )
+        docs = self.docs_latest
+        unwanted_counter = Counter(
+            match for text in docs for match in re.findall(unwanted_chars, text)
+        )
+        
+        # for text in docs:
+        #     all_matches = re.findall(unwanted_chars, text)
+        #     if all_matches:
+        #         for match in all_matches:
+        #             unwanted_counter.update(match)
 
-        prohibited_counter = Counter()
-        docs_list = self.docs_latest.to_list()
-        for text in docs_list:
-            all_matches = re.findall(prohibited_chars, text)
-            if all_matches:
-                for match in all_matches:
-                    prohibited_counter.update(match)
+        unwanted_total = sum(unwanted_counter.values())
+        unwanted_unique = set(unwanted_counter.keys())
 
-        prohibited_total = sum(prohibited_counter.values())
-        prohibited_unique = set(prohibited_counter.keys())
-
-        print(f'Total of {prohibited_total} occurrences of',
-              f'{len(prohibited_unique)} prohibited characters',
+        print(f'Total of {unwanted_total} occurrences of',
+              f'{len(unwanted_unique)} unwanted characters',
               'in dataframe.')
-        print(', '.join(prohibited_unique))
+        print(', '.join(unwanted_unique))
         top_10 = ', '.join([f'{char} ({count})'
-                            for char, count in prohibited_counter.most_common(10)])
+                            for char, count in unwanted_counter.most_common(10)])
         print('Most common (up to 10 displayed): ', top_10)
 
     # ====================
