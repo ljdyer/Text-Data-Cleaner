@@ -5,7 +5,7 @@ from collections import Counter
 
 import numpy as np
 import pandas as pd
-from IPython.display import HTML
+from IPython.display import display, HTML
 
 from typing import Union, List
 
@@ -31,8 +31,8 @@ class TextDataCleaner:
     def show_counts(self):
         """Print the numbers of documents, tokens, and characters in the
         latest version of the dataset.
-        """        
-    
+        """
+
         docs = self.docs_latest
         num_docs = len(docs)
         num_tokens = sum(map(len, map(lambda x: x.split(), docs)))
@@ -44,66 +44,61 @@ class TextDataCleaner:
     # ====================
     def show_unwanted_chars(self,
                             unwanted_chars: str = None):
-                            
+                 
         if unwanted_chars is not None:
             self.unwanted_chars = unwanted_chars
         else:
             if not hasattr(self, 'unwanted_chars'):
                 raise ValueError(
-                    "unwanted characters have not been specified. " + \
+                    "unwanted characters have not been specified. " +
                     "Call the method again with the unwanted_chars parameter."
                 )
         docs = self.docs_latest
         unwanted_counter = Counter(
-            match for text in docs for match in re.findall(unwanted_chars, text)
+            match for text in docs
+            for match in re.findall(unwanted_chars, text)
         )
-        
-        # for text in docs:
-        #     all_matches = re.findall(unwanted_chars, text)
-        #     if all_matches:
-        #         for match in all_matches:
-        #             unwanted_counter.update(match)
-
         unwanted_total = sum(unwanted_counter.values())
         unwanted_unique = set(unwanted_counter.keys())
-
         print(f'Total of {unwanted_total} occurrences of',
               f'{len(unwanted_unique)} unwanted characters',
               'in dataframe.')
         print(', '.join(unwanted_unique))
-        top_10 = ', '.join([f'{char} ({count})'
-                            for char, count in unwanted_counter.most_common(10)])
+        top_10 = ', '.join(
+            [f'{char} ({count})'
+             for char, count in unwanted_counter.most_common(10)]
+        )
         print('Most common (up to 10 displayed): ', top_10)
 
     # ====================
     def preview_replace(self,
-                        find_re: str,
-                        replace_re: str,
+                        find: str,
+                        replace: str,
                         num_samples: int = 10,
                         context_chars_before_after: int = 25,
                         normalize_spaces: bool = True):
 
-        matches = []
-        num_docs_with_matches = 0
-        docs_list = self.docs_latest.to_list()
-        for index, text in enumerate(docs_list):
-            iter_matches = list(re.finditer(find_re, text))
-            if iter_matches:
-                num_docs_with_matches += 1
-                for count, match in enumerate(iter_matches):
-                    context_str = get_context_str(
-                        text, match, context_chars_before_after)
-                    text_before = color_matches_red(
-                        find_re, context_str)
-                    text_after = color_replacements_green(
-                        find_re, replace_re, context_str, normalize_spaces)
-                    match_number = f'{count+1}/{len(iter_matches)}'
-                    matches.append((index, match_number, text_before, text_after))
-        if not matches:
+        docs = self.docs_latest
+        matches_by_doc = [list(re.finditer(find, text)) for text in docs]
+        num_docs_with_matches = len(m for m in matches_by_doc if len(m) > 0)
+        if num_docs_with_matches == 0:
             print('No matches found!')
             return
-        matches_df = pd.DataFrame(
-            matches, columns=['Doc index', 'Match number', 'Before', 'After'])
+        matches_all = []
+        for doc_idx, matches in enumerate(matches_by_doc):
+            for match_idx, match in enumerate(matches):
+                context_str = get_context_str(
+                    docs[doc_idx], match, context_chars_before_after),
+                matches_all.update(
+                    {
+                        'Document index': doc_idx,
+                        'Match number': f"{match_idx+1} of {len(matches)}",
+                        'Before': color_matches_red(find, context_str),
+                        'After': color_replacements_green(
+                            find, replace, context_str, normalize_spaces)
+                    }
+                )
+        matches_df = pd.DataFrame(matches_all)
         pd.set_option('display.max_colwidth', None)
         display(
             HTML(
@@ -113,10 +108,10 @@ class TextDataCleaner:
             )
         )
         pd.set_option('display.max_colwidth', 50)
-        print(f'Total of {len(matches)} matches in {num_docs_with_matches}',
-            'documents (rows).')
-
-
+        print(
+            f'Total of {len(matches)} matches in {num_docs_with_matches}',
+            'documents (rows).'
+        )
 
 
     # ====================
