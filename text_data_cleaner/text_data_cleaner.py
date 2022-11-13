@@ -9,6 +9,12 @@ from IPython.display import display, HTML
 
 from typing import Union, List, Tuple
 
+PREVIEW_BEFORE = """\
+<pre>{ellipsis_before}{text_before}\
+<span color="red">{match}</span>\
+{text_after}{ellipsis_after}</pre>
+"""
+
 
 # ====================
 class TextDataCleaner:
@@ -106,15 +112,14 @@ class TextDataCleaner:
         matches_all = []
         for doc_idx, matches in enumerate(matches_by_doc):
             for match_idx, match in enumerate(matches):
-                context_str = get_context_str(
-                    docs[doc_idx], match, context_chars_before_after)
+                preview_before, preview_after = preview_before_and_after(
+                    docs[doc_idx], find, replace, match, context_chars_before_after)
                 matches_all.append(
                     {
                         'Document index': doc_idx,
                         'Match number': f"{match_idx+1} of {len(matches)}",
-                        'Before': color_matches_red(find, context_str),
-                        'After': color_replacements_green(
-                            find, replace, context_str, normalize_spaces)
+                        'Before': preview_before,
+                        'After': preview_after
                     }
                 )
         matches_df = pd.DataFrame(matches_all)
@@ -126,7 +131,7 @@ class TextDataCleaner:
             )
         )
         print(
-            f'Total of {len(matches)} matches in {num_docs_with_matches}',
+            f'Total of {len(matches_all)} matches in {num_docs_with_matches}',
             'documents (rows).'
         )
 
@@ -204,17 +209,45 @@ class TextDataCleaner:
 # # === HELPER FUNCTIONS ===
 
 # ====================
+def preview_before_and_after(doc: str,
+                                 find: str,
+                                 replace: str,
+                                 match: re.Match,
+                                 context_chars_before_after: int) -> Tuple[str]:
+
+    match_start, match_end = match.span()
+    match_str = match.match()
+    text_start = max(0, match_start-context_chars_before_after)
+    ellipsis_before = '... ' if text_start > 0 else '    '
+    text_end = min(match_end+context_chars_before_after, len(doc))
+    ellipsis_after = ' ...' if text_end < len(text) else '    '
+    text_before = doc[text_start:match_start]
+    text_after = doc[match_end:text_end]
+    preview_before = PREVIEW_BEFORE.format(
+        ellipsis_before=ellipsis_before,
+        text_before=html.escape(text_before),
+        match=html.escape(match_str),
+        text_after=html.escape(text_after),
+        ellipsis_after=ellipsis_after
+    )
+    preview_after = ''
+    return preview_before, preview_after
+
+    
+
+    
+
+
+
+
+
+# ====================
 def get_context_str(text: str,
                     match: re.Match,
                     context_chars_before_after: int) -> str:
     """Return a substring showing the context of a regex match in a string"""
 
-    match_start, match_end = match.span()
-    start_pos = max(0, match_start-context_chars_before_after)
-    ellipsis_before = '...' if start_pos > 0 else ''
-    end_pos = min(match_end+context_chars_before_after, len(text))
-    ellipsis_after = '...' if end_pos < len(text) else ''
-    return ellipsis_before + text[start_pos:end_pos] + ellipsis_after
+    pass
 
 
 # ====================
@@ -222,11 +255,7 @@ def color_matches_red(find_re: str, input_str: str) -> str:
     """Return an HTML string in which all instances of the regex in the string
     are colored red"""
 
-    colored = re.sub(f"({find_re})", r'RED_START\1COLOR_END', input_str)
-    colored = html.escape(colored)
-    colored = colored.replace('RED_START', '<span style="color:red">')
-    colored = colored.replace('COLOR_END', '</span>')
-    return "<pre>" + colored + "</pre>"
+    pass
 
 # ====================
 def color_replacements_green(find_re: str,
