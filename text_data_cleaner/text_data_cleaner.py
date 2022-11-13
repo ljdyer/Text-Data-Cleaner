@@ -206,7 +206,11 @@ def color_matches_red(find_re: str, input_str: str) -> str:
     """Return an HTML string in which all instances of the regex in the string
     are colored red"""
 
-    colored = re.sub(f"({find_re})", r'RED_START\1COLOR_END', input_str)
+    try:
+        colored = re.sub(f"({find_re})", r'RED_START\1COLOR_END', input_str)
+    except:
+        print(find_re, input_str)
+
     colored = html.escape(colored)
     colored = colored.replace('RED_START', '<span style="color:red">')
     colored = colored.replace('COLOR_END', '</span>')
