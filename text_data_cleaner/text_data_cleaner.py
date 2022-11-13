@@ -8,6 +8,7 @@ from typing import List, Tuple, Union
 
 import pandas as pd
 from IPython.display import HTML, display
+from IPython.core.getipython import get_ipython
 
 PREVIEW_BEFORE = """\
 <pre>{ellipsis_before}{text_before}\
@@ -21,6 +22,20 @@ PREVIEW_AFTER = """\
 NAMED_OPERATIONS = {
     'NORMALIZE_UNICODE_TO_ASCII': 'Normalize unicode to ascii'
 }
+
+
+# ====================
+def set_css():
+    display(HTML('''
+    <style>
+        pre {
+            white-space: pre-wrap;
+        }
+    </style>
+    '''))
+
+    
+get_ipython().events.register('pre_run_cell', set_css)
 
 
 # ====================

@@ -1,6 +1,8 @@
-# Text data cleaner
+# Text Data Cleaner
 
-Helper functions for cleaning text data in a pandas dataframe in Google Colab.
+A Python library for cleaning text data for use in machine learning and natural language processing applications in IPython notebooks (Jupyter, Google Colab, etc.).
+
+Developed and used for the paper "Comparison of Token- and Character-Level Approaches to Restoration of Spaces, Punctuation, and Capitalization in Various Languages", which is scheduled for publication in December 2022.
 
 ## How to use
 
