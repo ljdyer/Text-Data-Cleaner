@@ -34,7 +34,7 @@ def set_css():
     </style>
     '''))
 
-    
+
 get_ipython().events.register('pre_run_cell', set_css)
 
 
@@ -75,6 +75,11 @@ class TextDataCleaner:
         print('Number of documents:', num_docs)
         print('Total number of tokens:', num_tokens)
         print('Total number of characters:', num_chars)
+
+    # ====================
+    def show_doc(self, doc_idx: int):
+
+        print(self.docs_latest[doc_idx])
 
     # ====================
     def show_unwanted_chars(self,
@@ -194,6 +199,15 @@ class TextDataCleaner:
             f'Total of {len(doc_and_match_idxs)} matches in ' +
             f'{num_docs_with_matches} documents (rows).'
         )
+        print()
+        self.last_previewed = find_replace
+        print("To apply this replacement operation to the dataset, run the" +
+              "apply_last_previewed method.")
+
+    # ====================
+    def apply_last_previewed(self):
+
+        self.replace(self.last_previewed)
 
     # ====================
     def replace(self,

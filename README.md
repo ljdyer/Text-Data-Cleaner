@@ -1,6 +1,8 @@
 # Text Data Cleaner
 
-A Python library for cleaning text data for use in machine learning and natural language processing applications in IPython notebooks (Jupyter, Google Colab, etc.).
+A Python library for cleaning text data for use in machine learning and natural language processing applications
+
+Designed to be used in IPython notebooks (Jupyter, Google Colab, etc.).
 
 Developed and used for the paper "Comparison of Token- and Character-Level Approaches to Restoration of Spaces, Punctuation, and Capitalization in Various Languages", which is scheduled for publication in December 2022.
 
