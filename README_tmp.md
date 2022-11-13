@@ -50,68 +50,136 @@ my_fre = FeatureRestorationEvaluator(
 
 #### `TextDataCleaner.show_unwanted_chars`
 
-[-*func_or_method FRMG>show_unwanted_chars
+[-*func_or_method TDC>show_unwanted_chars
 
 #### Example usage:
 
 ```python
-my_fre.show_prfs()
+data_cleaner.show_unwanted_chars(unwanted_chars = r'[^A-Za-z0-9 \.,]')
 ```
 
-<img src="readme-img/02-show_prfs.PNG"></img>
+<img src="readme-img/02-show_unwanted_chars.PNG"></img>
 
-### Show confusion matrices
+### Preview a regex replacement operation
 
-#### `FeatureRestorationEvaluator.show_confusion_matrices`
+#### `TextDataCleaner.preview_replace`
 
-[-*func_or_method FRMG>show_confusion_matrices
+[-*func_or_method TDC>preview_replace
 
 #### Example usage:
 
 ```python
-my_fre.show_confusion_matrices('all', ['CAPS'])
+data_cleaner.preview_replace((r'[\(|\)]', ''))
 ```
 
-<img src="readme-img/03-show_confusion_matrices.PNG"></img>
+<img src="readme-img/03-preview_replace.PNG"></img>
 
-### Show word error rate (WER) information
+### Apply the last previewed replacement operation
 
-#### `FeatureRestorationEvaluator.show_wer_info`
+#### `TextDataCleaner.apply_last_previewed`
 
-[-*func_or_method FRMG>show_wer_info
+[-*func_or_method TDC>apply_last_previewed
 
 #### Example usage:
 
 ```python
-my_fre.show_wer_info()
+data_cleaner.apply_last_previewed()
 ```
 
-<img src="readme-img/04-show_wer_info.PNG"></img>
+<img src="readme-img/04-apply_last_previewed.PNG"></img>
 
-### Display the hypothesis document with false positives and false negatives highlighted
+### Apply one or more replacement operations without previewing
 
-#### `FeatureRestorationEvaluator.show_text_display`
+#### `TextDataCleaner.replace`
 
-[-*func_or_method FRMG>show_text_display
+[-*func_or_method TDC>replace
 
 #### Example usage:
 
 ```python
-my_fre.show_text_display(0, num_rows=5, chars_per_row=40)
+data_cleaner.replace([
+    (r'"', r''),
+    (r'&', r' and '),
+    (r':', r',')
+])
 ```
 
-<img src="readme-img/05-show_text_display.PNG"></img>
+<img src="readme-img/05-replace.PNG"></img>
 
-### Display a list of errors for a given feature in a given document
+### Normalize unicode characters to their ASCII equivalents
 
-#### `FeatureRestorationEvaluator.show_feature_errors`
+#### `TextDataCleaner.normalize_unicode_to_ascii`
 
-[-*func_or_method FRMG>show_feature_errors
+[-*func_or_method TDC>normalize_unicode_to_ascii
 
 #### Example usage:
 
 ```python
-my_fre.show_feature_errors(0, '.')
+data_cleaner.normalize_unicode_to_ascii()
 ```
 
-<img src="readme-img/06-show_feature_errors.PNG"></img>
+### Show the history of operations carry out so far
+
+#### `TextDataCleaner.show_operation_history`
+
+[-*func_or_method TDC>show_operation_history
+
+#### Example usage:
+
+```python
+data_cleaner.show_operation_history()
+```
+
+<img src="readme-img/06-show_operation_history.PNG"></img>
+
+### Reapply all operations in the history from scratch to the original dataset
+
+#### `TextDataCleaner.refresh_latest_docs`
+
+[-*func_or_method TDC>refresh_latest_docs
+
+#### Example usage:
+
+```python
+data_cleaner.refresh_latest_docs()
+```
+
+<img src="readme-img/07-refresh_latest_docs.PNG"></img>
+
+### Load previously saved operation history from a pickle file
+
+#### `TextDataCleaner.load_operation_history`
+
+[-*func_or_method TDC>load_operation_history
+
+#### Example usage:
+
+```python
+data_cleaner.load_operation_history(operations_pickle_path)
+```
+
+<img src="readme-img/08-load_operation_history.PNG"></img>
+
+[-*func_or_method TDC>load_operation_history
+
+#### Example usage:
+
+```python
+data_cleaner.load_operation_history(operations_pickle_path)
+```
+
+<img src="readme-img/08-load_operation_history.PNG"></img>
+
+### Show the latest version of a document from the dataset
+
+#### `TextDataCleaner.show_doc`
+
+[-*func_or_method TDC>show_doc
+
+#### Example usage:
+
+```python
+data_cleaner.show_doc(0)
+```
+
+<img src="readme-img/09-show_doc.PNG"></img>

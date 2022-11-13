@@ -1,5 +1,6 @@
 .vscode/*
 requirements_dev.txt
+README_tmp.md
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

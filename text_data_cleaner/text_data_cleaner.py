@@ -58,6 +58,12 @@ class TextDataCleaner:
     def show_counts(self, show_change: bool = True):
         """Print the numbers of documents, tokens, and characters in the
         latest version of the dataset.
+
+        Args:
+          show_change (bool, optional):
+            Whether to display information about the change in the counts
+            from the operations carried out since the counts were last
+            displayed. Defaults to True.
         """
 
         docs = self.docs_latest
@@ -85,6 +91,12 @@ class TextDataCleaner:
 
     # ====================
     def show_doc(self, doc_idx: int):
+        """Display the latest version of a document in the dataset.
+
+        Args:
+          doc_idx (int):
+            The index of the document in the dataset.
+        """
 
         display_text_wrapped(self.docs_latest[doc_idx])
 
@@ -168,6 +180,13 @@ class TextDataCleaner:
 
     # ====================
     def refresh_latest_docs(self):
+        """Sync the latest version of the documents with the operation
+        history by applying all operations in the history to the original
+        dataset from scratch.
+
+        Should be carried out after making any direct changes to the 
+        operation_history attribute of an instance.
+        """        
 
         self.docs_latest = self.docs_original
         print('Original docs')
@@ -184,6 +203,29 @@ class TextDataCleaner:
         print('Latest (cleaned) docs')
         print('=====================')
         self.show_counts()
+
+    # ====================
+    def get_latest_documents(self,
+                             as_pandas_series: bool = False
+                             ) -> Union[list, pd.Series]:
+        """Get the latest version of the dataset as either a list or
+        pandas series.
+
+        Args:
+          as_pandas_series (bool, optional):
+            Whether to convert the list of cleaned document to a pandas series
+            before returning. Defaults to False.
+
+        Returns:
+          Union[list, pd.Series]:
+            The latest version of the dataset as either a list or
+            pandas series.
+        """
+
+        if as_pandas_series is True:
+            return pd.Series(self.docs_latest)
+        else:
+            return self.docs_latest
 
     # ====================
     def preview_replace(self,
@@ -254,6 +296,13 @@ class TextDataCleaner:
 
     # ====================
     def apply_last_previewed(self, note: str = None):
+        """Apply the most recently previewed replacement operation.
+
+        Args:
+          note (str, optional):
+            A note to describe the replacement operation to display
+            when viewing the operation history. Defaults to None.
+        """
 
         if note is not None:
             self.last_previewed = self.last_previewed + (note,)
@@ -297,7 +346,7 @@ class TextDataCleaner:
         if verbose_mode is True:
             if len_after < len_before:
                 print(
-                    "Removed {len_before-len_after} documents that were " +
+                    f"Removed {len_before-len_after} documents that were " +
                     "empty or contained only spaces following the operations."
                 )
             print('Done.')
