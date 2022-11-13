@@ -61,20 +61,38 @@ class TextDataCleaner:
         self.docs_latest = docs
         self.operation_history = []
         self.normalize_spaces = normalize_spaces
+        print("Initialized.")
+        print()
+        self.show_counts(show_change=False)
 
     # ====================
-    def show_counts(self):
+    def show_counts(self, show_change: bool = True):
         """Print the numbers of documents, tokens, and characters in the
         latest version of the dataset.
         """
 
         docs = self.docs_latest
+        if show_change is True:
+            docs_before = self.num_docs
+            tokens_before = self.num_tokens
+            chars_before = self.num_chars
         num_docs = len(docs)
         num_tokens = sum(map(len, map(lambda x: x.split(), docs)))
         num_chars = sum(map(len, docs))
-        print('Number of documents:', num_docs)
-        print('Total number of tokens:', num_tokens)
-        print('Total number of characters:', num_chars)
+        if show_change is False:
+            print('Number of documents:', num_docs)
+            print('Total number of tokens:', num_tokens)
+            print('Total number of characters:', num_chars)
+        else:
+            print(f'Number of documents: {num_docs} ' +
+                  f' {show_change(docs_before, num_docs)}')
+            print(f'Total number of tokens: {num_tokens} ' +
+                  f' {show_change(tokens_before, num_tokens)}')
+            print(f'Total number of characters: {num_chars} ' +
+                  f' {show_change(chars_before, num_chars)}')
+        self.num_docs = num_docs
+        self.num_tokens = num_tokens
+        self.num_chars = num_chars
 
     # ====================
     def show_doc(self, doc_idx: int):
@@ -245,8 +263,6 @@ class TextDataCleaner:
         print('Done.')
         self.operation_history.extend(find_replace)
         print()
-        print('Latest counts:')
-        print('==============')
         self.show_counts()
 
     # ====================
@@ -334,6 +350,23 @@ def get_context_after(text: str,
     ellipsis = ' ...' if len(text) > context_len else '    '
     context = text[:context_len].ljust(context_len)
     return ellipsis, context
+
+
+# ====================
+def show_change_(before, after):
+
+    if before > after:
+        return f'<span style="color:green">↓ {after-before}</span>'
+    elif after < before:
+        return f'<span style="color:red">↑ {before-after}</span>'
+    else:
+        return 'no change'
+
+
+# ====================
+def display_html(x: str):
+
+    display(HTML(x))
 
 
 # # === CONTEXT MANAGERS ===
