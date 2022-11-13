@@ -160,16 +160,6 @@ data_cleaner.load_operation_history(operations_pickle_path)
 
 <img src="readme-img/08-load_operation_history.PNG"></img>
 
-[-*func_or_method TDC>load_operation_history
-
-#### Example usage:
-
-```python
-data_cleaner.load_operation_history(operations_pickle_path)
-```
-
-<img src="readme-img/08-load_operation_history.PNG"></img>
-
 ### Show the latest version of a document from the dataset
 
 #### `TextDataCleaner.show_doc`
@@ -183,3 +173,18 @@ data_cleaner.show_doc(0)
 ```
 
 <img src="readme-img/09-show_doc.PNG"></img>
+
+### Get the latest (cleaned) version of the dataset
+
+#### `TextDataCleaner.get_latest_documents`
+
+[-*func_or_method TDC>get_latest_documents
+
+#### Example usage:
+
+```python
+data_cleaner.get_latest_documents(as_pandas_series=True)
+```
+
+<img src="readme-img/10-get_latest_documents.PNG"></img>
+

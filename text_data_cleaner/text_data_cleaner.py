@@ -146,6 +146,8 @@ class TextDataCleaner:
 
     # ====================
     def show_operation_history(self):
+        """Display the history of operations carried out on the dataset.
+        """
 
         operations = []
         for operation_idx, operation in enumerate(
@@ -174,6 +176,12 @@ class TextDataCleaner:
 
     # ====================
     def load_operation_history(self, pickle_path: str):
+        """Load previously saved operation history from a pickle file.
+
+        Args:
+          pickle_path (str):
+            Path or URL to the pickle file containing the operation history
+        """        
 
         self.operation_history = load_pickle(pickle_path)
         self.refresh_latest_docs()

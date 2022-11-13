@@ -6,186 +6,329 @@ Designed to be used in IPython notebooks (Jupyter, Google Colab, etc.).
 
 Developed and used for the paper "Comparison of Token- and Character-Level Approaches to Restoration of Spaces, Punctuation, and Capitalization in Various Languages", which is scheduled for publication in December 2022.
 
-## How to use
+## Interactive demo
 
-The recommended method to save and import the `text_data_cleaner` module into a Google Colab notebook is:
+The quickest and best way to get acquainted with the library is through the interactive demo [here](https://colab.research.google.com/drive/1tXnlmjPEzJx1ZNAAVXcvP3N2Q-kxpsQL?usp=sharing), where you can walk through the steps involved in using the library and clean some sample data from the Ted Talks dataset used in the paper.
 
-```python
-url = 'https://raw.githubusercontent.com/ljdyer/text-data-cleaner/main/text_data_cleaner.py'
-!wget --no-cache -backups=1 'text_data_cleaner.py' {url}
+Alternatively, scroll down for instructions on getting started and basic documentation.
+
+## Getting started
+
+### Install the library using `pip`
+
+```
+!pip install git+https://github.com/ljdyer/Text-Data-Cleaner.git
 ```
 
-Then (in a separate cell):
+### Import the `TextDataCleaner` class
 
 ```python
-import text_data_cleaner
-from text_data_cleaner import *
+from text_data_cleaner import text_data_cleaner
 ```
 
-(Method A.2.1 in https://colab.research.google.com/github/jckantor/cbe61622/blob/master/docs/A.02-Downloading_Python_source_files_from_github.ipynb)
+## Clean data using the `TextDataCleaner` class
 
-You may find that changes are not reflected when new versions are released. This can usually be resolved by selecting "Runtime" > "Reset factory runtime" in the Google Colab menu. Check the version you are using by running `help(text_data_cleaner)`.
+### Initialize an instance of the `TextDataCleaner` class
 
-## Functions
-
-The example usage screenshots in this section are from a project where I had to reduce text data from transcripts of TED Talks to leave only the characters a-z, A-Z, 0-9, space, comma, and period. You can see the full notebook [here](clean_ted_talks.ipynb).
-
-### show_doc_and_word_counts
+#### `TextDataCleaner.__init__`
 
 ```python
-# ====================
-def show_doc_and_word_counts(df: pd.DataFrame,
-                             text_column_name: str = 'Text'):
+    # ====================
+    def __init__(self,
+                 docs: Union[List, pd.Series],
+                 normalize_spaces: bool = True):
+        """Initialize an instance of the class
 
-    """Show the number of documents (rows) and words in a text column of a
-    pandas dataframe.
-
-    Words are defined simply as consecutive chains of non-whitespace characters
-    (because word tokenizing takes time!)
-
-    Required arguments:
-    -------------------
-    df: pd.DataFrame                    A dataframe with a text column
-
-    Optional keyword arguments:
-    ---------------------------
-    text_column_name: str = 'Text'      The name of the text column in the
-                                        dataframe
-    """
+        Args:
+          docs (Union[List, pd.Series]):
+            The list of documents to clean.
+          normalize_spaces (bool, optional):
+            Whether or not to replace two or more subsequent spaces with a
+            single space after carrying out each operation. Defaults to True.
+        """
 ```
 
-Example usage: 
-
-<img src="readme-img/show_word_and_doc_counts.PNG"></img>
-
-### show_prohibited_chars
+#### Example usage:
 
 ```python
-def show_prohibited_chars(df: pd.DataFrame,
-                          prohibited_chars_re: str = r'[^A-Za-z0-9 \.,]',
-                          text_column_name='Text',
-                          print_all=False
-                          ) -> pd.DataFrame:
-
-    """Print information about the occurrence of prohibited characters in the
-    text column of your dataframe
-
-    Required arguments:
-    -------------------
-    df: pd.DataFrame                    A dataframe with a text column
-
-    Optional keyword arguments:
-    ---------------------------
-    prohibited_chars_re: str = r'[^A-Za-z0-9 \.,]'
-                                        A regex that matches prohibited
-                                        characters
-    text_column_name: str = 'Text'      The name of the text column in the
-                                        dataframe
-    print_all: bool = False             If True, prints a list of all of the
-                                        (unique) prohibited characters in the
-                                        text column
-    """
+my_fre = FeatureRestorationEvaluator(
+    data_cleaner = TextDataCleaner(data['transcript'])
+)
 ```
 
-Example usage: 
+<img src="readme-img/01-init.PNG"></img>
 
-<img src="readme-img/show_prohibited_chars.PNG"></img>
+### Show unwanted characters in the dataset
 
-### preview_regex_replace
+#### `TextDataCleaner.show_unwanted_chars`
 
 ```python
-def preview_regex_replace(find_re: str,
-                          replace_re: str,
-                          df: pd.DataFrame,
-                          text_column_name: str = 'Text',
-                          num_samples: int = 10,
-                          context_chars_before_after: int = 25,
-                          norm_spaces: bool = True):
+    # ====================
+    def show_unwanted_chars(self,
+                            unwanted_chars: str = None):
+        """Show unwanted characters in the latest version of the dataset
 
-    r"""Preview the effects of a regex replace operation on your dataframe
-    before you apply it.
+        Args:
+          unwanted_chars (str, optional):
+            A regular expression that matches unwanted characters.
+            E.g. r'[^A-Za-z0-9 \.,]'      # noqa: W605
+            if you only want alphanumeric characters, spaces, periods,
+            and commas in the cleaned dataset.
 
-    Required arguments:
-    -------------------
-    find_re: str                        The regex to find e.g. r'\((\w)\)'
-    replace_re: str                     The regex to replace it with e.g. r'\1'
-    df: pd.DataFrame                    A dataframe with a text column
-
-    Optional keyword arguments:
-    ---------------------------
-    text_column_name: str = 'Text'      The name of the text column in the
-                                        dataframe
-    num_samples: int = 10               The number of example replacements to
-                                        display
-    context_chars_before_after: int = 25
-                                        The number of characters to display
-                                        before and after the match in each
-                                        example
-    norm_spaces: bool = True,           If True, normalizes spaces after
-                                        performing replacement
-    """
+        Raises:
+          ValueError:
+            If unwanted_chars has not been set for the class instances and
+            is also not passed as a parameter.
+        """
 ```
 
-Example usage:
-
-<img src="readme-img/preview_regex_replace.PNG"></img>
-
-### regex_replace
+#### Example usage:
 
 ```python
-def regex_replace(regex_list: list,
-                  df: pd.DataFrame,
-                  text_column_name: str = 'Text',
-                  norm_spaces: bool = True,
-                  drop_empty_rows: bool = True
-                  ) -> pd.DataFrame:
-
-    """Perform a sequence of one or more regex replace operations on all cells
-    in the text column of your dataframe
-
-    Required arguments:
-    -------------------
-    regex_list: list                    A list of (find, replace) tuples
-                                        e.g. (r'\(\w+\)', r'')
-    df: pd.DataFrame                    A dataframe with a text column
-
-    Optional keyword arguments:
-    ---------------------------
-    text_column_name: str = 'Text'      The name of the text column in the
-                                        dataframe
-    norm_spaces: bool = True,           If True, normalizes spaces after
-                                        performing replacement
-    drop_empty_rows: bool = True        If True, drops any rows with empty
-                                        strings following replacement
-    """
+data_cleaner.show_unwanted_chars(unwanted_chars = r'[^A-Za-z0-9 \.,]')
 ```
 
-Example usage:
+<img src="readme-img/02-show_unwanted_chars.PNG"></img>
 
-<img src="readme-img/regex_replace.PNG"></img>
+### Preview a regex replacement operation
 
-### normalize_unicode
+#### `TextDataCleaner.preview_replace`
 
 ```python
-def normalize_unicode(df: pd.DataFrame,
-                      text_column_name='Text'
-                      ) -> pd.DataFrame:
+    # ====================
+    def preview_replace(self,
+                        find_replace: Tuple[str],
+                        num_samples: int = 10,
+                        context_chars_before_after: int = 25):
+        """Preview the effect of carrying out a regular expression replacement
+        operation on the dataset.
 
-    """Normalize unicode characters (replace accented characters with their
-    non-accented equivalents & remove other non-ascii characters) in all cells
-    in the text column of your dataframe.
-
-    Required arguments:
-    -------------------
-    df: pd.DataFrame                    A dataframe with a text column
-
-    Optional keyword arguments:
-    ---------------------------
-    text_column_name: str = 'Text'      The name of the text column in the
-                                        dataframe
-    """
+        Args:
+          find_replace (Tuple[str]):
+            A tuple (find, replace) of the regular expression find and replace strings.
+            Examples:
+                (r'[\(|\)]', '')    # noqa W605
+                (r'([0-9]+):([0-9]+)', r'\1 \2')
+            The tuple can also have an optional third element, which will be treated as
+            a note and displayed when showing operation history.
+          num_samples (int, optional):
+            The number of samples (locations in documents where a replacement would take place)
+            to display. Defaults to 10.
+          context_chars_before_after (int, optional):
+            The number of characters to display before and after the replacement location in
+            each sample. Defaults to 25.
+        """
 ```
 
-Example usage:
+#### Example usage:
 
-<img src="readme-img/normalize_unicode.PNG"></img>
+```python
+data_cleaner.preview_replace((r'[\(|\)]', ''))
+```
+
+<img src="readme-img/03-preview_replace.PNG"></img>
+
+### Apply the last previewed replacement operation
+
+#### `TextDataCleaner.apply_last_previewed`
+
+```python
+    # ====================
+    def apply_last_previewed(self, note: str = None):
+        """Apply the most recently previewed replacement operation.
+
+        Args:
+          note (str, optional):
+            A note to describe the replacement operation to display
+            when viewing the operation history. Defaults to None.
+        """
+```
+
+#### Example usage:
+
+```python
+data_cleaner.apply_last_previewed()
+```
+
+<img src="readme-img/04-apply_last_previewed.PNG"></img>
+
+### Apply one or more replacement operations without previewing
+
+#### `TextDataCleaner.replace`
+
+```python
+    # ====================
+    def replace(self,
+                find_replace: Union[List[Tuple], Tuple],
+                verbose_mode: bool = True):
+        """Perform a regular expression replacement operation on the whole
+        dataset.
+
+        Args:
+          find_replace (Union[List[Tuple], Tuple]):
+            A tuple (find, replace) of regular expression find and replace strings,
+            or a list of such tuples.
+            Examples of (find, replace) tuples:
+                (r'[\(|\)]', '')    # noqa W605
+                (r'([0-9]+):([0-9]+)', r'\1 \2')
+            Tuples can also have an optional third element, which will be treated as
+            a note and displayed when showing operation history.
+          verbose_mode (bool, optional):
+            Whether to display information about empty documents that were dropped
+            and new counts following the replacement operation. Defaults to True.
+        """
+```
+
+#### Example usage:
+
+```python
+data_cleaner.replace([
+    (r'"', r''),
+    (r'&', r' and '),
+    (r':', r',')
+])
+```
+
+<img src="readme-img/05-replace.PNG"></img>
+
+### Normalize unicode characters to their ASCII equivalents
+
+#### `TextDataCleaner.normalize_unicode_to_ascii`
+
+```python
+    # ====================
+    def normalize_unicode_to_ascii(self):
+        """Normalize all unicode characters in the dataset to the ASCII equivalents.
+
+        Replaces accented characters with their non-accented equivalents and
+        removes other non-ASCII characters.
+        """
+```
+
+#### Example usage:
+
+```python
+data_cleaner.normalize_unicode_to_ascii()
+```
+
+### Show the history of operations carry out so far
+
+#### `TextDataCleaner.show_operation_history`
+
+```python
+    # ====================
+    def show_operation_history(self):
+        """Display the history of operations carried out on the dataset.
+        """
+```
+
+#### Example usage:
+
+```python
+data_cleaner.show_operation_history()
+```
+
+<img src="readme-img/06-show_operation_history.PNG"></img>
+
+### Reapply all operations in the history from scratch to the original dataset
+
+#### `TextDataCleaner.refresh_latest_docs`
+
+```python
+    # ====================
+    def refresh_latest_docs(self):
+        """Sync the latest version of the documents with the operation
+        history by applying all operations in the history to the original
+        dataset from scratch.
+
+        Should be carried out after making any direct changes to the 
+        operation_history attribute of an instance.
+        """
+```
+
+#### Example usage:
+
+```python
+data_cleaner.refresh_latest_docs()
+```
+
+<img src="readme-img/07-refresh_latest_docs.PNG"></img>
+
+### Load previously saved operation history from a pickle file
+
+#### `TextDataCleaner.load_operation_history`
+
+```python
+    # ====================
+    def load_operation_history(self, pickle_path: str):
+        """Load previously saved operation history from a pickle file.
+
+        Args:
+          pickle_path (str):
+            Path or URL to the pickle file containing the operation history
+        """
+```
+
+#### Example usage:
+
+```python
+data_cleaner.load_operation_history(operations_pickle_path)
+```
+
+<img src="readme-img/08-load_operation_history.PNG"></img>
+
+### Show the latest version of a document from the dataset
+
+#### `TextDataCleaner.show_doc`
+
+```python
+    # ====================
+    def show_doc(self, doc_idx: int):
+        """Display the latest version of a document in the dataset.
+
+        Args:
+          doc_idx (int):
+            The index of the document in the dataset.
+        """
+```
+
+#### Example usage:
+
+```python
+data_cleaner.show_doc(0)
+```
+
+<img src="readme-img/09-show_doc.PNG"></img>
+
+### Get the latest (cleaned) version of the dataset
+
+#### `TextDataCleaner.get_latest_documents`
+
+```python
+    # ====================
+    def get_latest_documents(self,
+                             as_pandas_series: bool = False
+                             ) -> Union[list, pd.Series]:
+        """Get the latest version of the dataset as either a list or
+        pandas series.
+
+        Args:
+          as_pandas_series (bool, optional):
+            Whether to convert the list of cleaned document to a pandas series
+            before returning. Defaults to False.
+
+        Returns:
+          Union[list, pd.Series]:
+            The latest version of the dataset as either a list or
+            pandas series.
+        """
+```
+
+#### Example usage:
+
+```python
+data_cleaner.get_latest_documents(as_pandas_series=True)
+```
+
+<img src="readme-img/10-get_latest_documents.PNG"></img>
+
