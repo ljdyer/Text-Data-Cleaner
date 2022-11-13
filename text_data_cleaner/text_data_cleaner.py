@@ -19,7 +19,7 @@ PREVIEW_AFTER = """\
 {text_after}{ellipsis_after}</pre>"""
 
 NAMED_OPERATIONS = {
-    'NORMALIZE-UNICODE-TO-ASCII': 'Normalize unicode to ascii'
+    'NORMALIZE-UNICODE-TO-ASCII': 'Normalize unicode to ASCII'
 }
 
 WRAP_PRE = "<style>pre {white-space: pre-wrap;}</style>"
@@ -115,7 +115,7 @@ class TextDataCleaner:
         docs = self.docs_latest
         unwanted_counter = Counter(
             match for text in docs
-            for match in re.findall(unwanted_chars, text)
+            for match in re.findall(self.unwanted_chars, text)
         )
         unwanted_total = sum(unwanted_counter.values())
         unwanted_unique = set(unwanted_counter.keys())
