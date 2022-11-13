@@ -310,10 +310,11 @@ def normalize_unicode_string(input_str: str) -> str:
 
 # =====
 @contextmanager
-def pandas_options(options: Union[List[Tuple], Tuple]):
+def pandas_options(options: List[Tuple]):
 
-    # before = pd.get_option("display.colheader_justify")
-    # pd.set_option("display.colheader_justify", "center")
-    print('Doing stuff before')
+    before = [pd.get_option(option_name) for option_name, _ in options]
+    for option in options:
+        pd.set_option(*option)
     yield
-    print('Doing stuff after')
+    for option_idx, option in enumerate(options):
+        pd.set_option(option[0], before[option_idx])
