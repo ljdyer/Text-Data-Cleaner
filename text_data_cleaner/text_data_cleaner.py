@@ -113,11 +113,14 @@ class TextDataCleaner:
             print('No matches found!')
             return
         doc_and_match_idxs = [
-            (doc_idx, match_idx) 
+            (doc_idx, match_idx)
             for doc_idx in range(len(docs))
             for match_idx in range(len(matches_by_doc[doc_idx]))
         ]
-        sample_idxs = random.sample(doc_and_match_idxs, k=num_samples)
+        if num_samples > len(doc_and_match_idxs):
+            sample_idxs = doc_and_match_idxs
+        else:
+            sample_idxs = random.sample(doc_and_match_idxs, k=num_samples)
         samples = []
         for doc_idx, match_idx in sample_idxs:
             doc = docs[doc_idx]
