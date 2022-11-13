@@ -6,6 +6,7 @@ from collections import Counter
 from contextlib import contextmanager
 from typing import List, Tuple, Union, Any
 import pickle
+import urllib.request
 
 import pandas as pd
 from IPython.display import HTML, display
@@ -432,8 +433,13 @@ def save_pickle(data: Any, fp: str):
 def load_pickle(fp: str) -> Any:
     """Load a .pickle file and return the data"""
 
-    with open(fp, 'rb') as f:
-        unpickled = pickle.load(f)
+    if 'http' in fp:
+        print("Loading from URL.")
+        with(urllib.request.urlopen(fp)) as f:
+            unpickled = pickle.load(f)    
+    else:
+        with open(fp, 'rb') as f:
+            unpickled = pickle.load(f)
     return unpickled
 
 
