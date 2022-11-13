@@ -167,12 +167,18 @@ class TextDataCleaner:
     def refresh_latest_docs(self):
 
         self.docs_latest = self.docs_original
+        print('Original docs')
+        print('=============')
+        self.show_counts()
+        print()
         for operation in self.operation_history:
             print(operation)
             if isinstance(operation, tuple):
                 self.replace(operation, verbose_mode=False)
             elif operation == "NORMALIZE-UNICODE-TO-ASCII":
                 self.normalize_unicode_to_ascii()
+        print('Latest (cleaned) docs')
+        print('=====================')
         self.show_counts()
 
     # ====================
