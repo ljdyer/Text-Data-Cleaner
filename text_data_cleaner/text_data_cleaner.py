@@ -216,7 +216,6 @@ def preview_before_and_after(doc: str,
                                  context_chars_before_after: int) -> Tuple[str]:
 
     match_start, match_end = match.span()
-    match_str = match.match()
     text_start = max(0, match_start-context_chars_before_after)
     ellipsis_before = '... ' if text_start > 0 else '    '
     text_end = min(match_end+context_chars_before_after, len(doc))
@@ -226,7 +225,7 @@ def preview_before_and_after(doc: str,
     preview_before = PREVIEW_BEFORE.format(
         ellipsis_before=ellipsis_before,
         text_before=html.escape(text_before),
-        match=html.escape(match_str),
+        match=html.escape(match),
         text_after=html.escape(text_after),
         ellipsis_after=ellipsis_after
     )
