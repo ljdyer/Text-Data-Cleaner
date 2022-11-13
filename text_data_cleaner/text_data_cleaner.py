@@ -128,7 +128,8 @@ class TextDataCleaner:
             [f'{char} ({count})'
              for char, count in unwanted_counter.most_common(10)]
         )
-        print('Most common (up to 10 displayed): ', top_10)
+        if unwanted_total > 1:
+            print('Most common (up to 10 displayed): ', top_10)
 
     # ====================
     def show_operation_history(self):
@@ -162,6 +163,7 @@ class TextDataCleaner:
     def load_operations(self, pickle_path: str):
 
         self.operation_history = load_pickle(pickle_path)
+        self.refresh_latest_docs()
 
     # ====================
     def refresh_latest_docs(self):
@@ -172,8 +174,8 @@ class TextDataCleaner:
         self.show_counts(show_change=False)
         print()
         operation_history = self.operation_history.copy()
+        self.operation_history = []
         for operation in operation_history:
-            print(operation)
             if isinstance(operation, tuple):
                 self.replace(operation, verbose_mode=False)
             elif operation == "NORMALIZE-UNICODE-TO-ASCII":
