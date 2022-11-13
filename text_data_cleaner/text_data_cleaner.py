@@ -8,7 +8,6 @@ from typing import List, Tuple, Union
 
 import pandas as pd
 from IPython.display import HTML, display
-from IPython.core.getipython import get_ipython
 
 PREVIEW_BEFORE = """\
 <pre>{ellipsis_before}{text_before}\
@@ -23,11 +22,7 @@ NAMED_OPERATIONS = {
     'NORMALIZE_UNICODE_TO_ASCII': 'Normalize unicode to ascii'
 }
 
-
-
-
-
-# get_ipython().events.register('pre_run_cell', wrap_output)
+WRAP_PRE = "<style>pre {white-space: pre-wrap;}</style>"
 
 
 # ====================
@@ -89,7 +84,7 @@ class TextDataCleaner:
     # ====================
     def show_doc(self, doc_idx: int):
 
-        print(self.docs_latest[doc_idx])
+        display_text_wrapped(self.docs_latest[doc_idx])
 
     # ====================
     def show_unwanted_chars(self,
@@ -368,15 +363,10 @@ def display_html_pre(content: str):
 
 
 # ====================
-def wrap_output():
+def display_text_wrapped(content: str):
 
-    display_html('''
-    <style>
-        pre {
-            white-space: pre-wrap;
-        }
-    </style>
-    ''')
+    content = html.escape(content)
+    display_html(WRAP_PRE + f"<pre>{content}</pre>")
 
 
 # # === CONTEXT MANAGERS ===
