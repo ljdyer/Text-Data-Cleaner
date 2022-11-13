@@ -4,7 +4,8 @@ import re
 import unicodedata
 from collections import Counter
 from contextlib import contextmanager
-from typing import List, Tuple, Union
+from typing import List, Tuple, Union, Any
+import pickle
 
 import pandas as pd
 from IPython.display import HTML, display
@@ -44,7 +45,7 @@ class TextDataCleaner:
 
         if isinstance(docs, pd.Series):
             docs = docs.to_list()
-        self.docs_orig = docs
+        self.docs_original = docs
         self.docs_latest = docs
         self.operation_history = []
         self.normalize_spaces = normalize_spaces
@@ -153,6 +154,27 @@ class TextDataCleaner:
             display_html(operations_df.to_html(escape=False, index=False))
 
     # ====================
+    def save_operation_history(self, pickle_path: str):
+
+        save_pickle(self.operation_history, pickle_path)
+
+    # ====================
+    def load_operations(self, pickle_path: str):
+
+        self.operation_history = load_pickle(pickle_path)
+
+    # ====================
+    def refresh_latest_docs(self):
+
+        self.docs_latest = self.docs_original
+        for operation in self.operation_history:
+            if isinstance(operation, tuple):
+                self.replace(operation, verbose_mode=False)
+            elif operation == "NORMALIZE-UNICODE-TO-ASCII":
+                self.normalize_unicode_to_ascii()
+        self.show_counts()
+
+    # ====================
     def preview_replace(self,
                         find_replace: Tuple[str],
                         num_samples: int = 10,
@@ -228,7 +250,8 @@ class TextDataCleaner:
 
     # ====================
     def replace(self,
-                find_replace: Union[List[Tuple], Tuple]):
+                find_replace: Union[List[Tuple], Tuple],
+                verbose_mode: bool = True):
         """Perform a regular expression replacement operation on the whole
         dataset.
 
@@ -241,6 +264,9 @@ class TextDataCleaner:
                 (r'([0-9]+):([0-9]+)', r'\1 \2')
             Tuples can also have an optional third element, which will be treated as
             a note and displayed when showing operation history.
+          verbose_mode (bool, optional):
+            Whether to display information about empty documents that were dropped
+            and new counts following the replacement operation. Defaults to True.
         """                
 
         if isinstance(find_replace, tuple):
@@ -256,15 +282,16 @@ class TextDataCleaner:
             if not (doc.isspace() or len(doc) == 0)
         ]
         len_after = len(self.docs_latest)
-        if len_after < len_before:
-            print(
-                "Removed {len_before-len_after} documents that were empty " +
-                "or contained only spaces following the operations."
-            )
-        print('Done.')
         self.operation_history.extend(find_replace)
-        print()
-        self.show_counts()
+        if verbose_mode is True:
+            if len_after < len_before:
+                print(
+                    "Removed {len_before-len_after} documents that were " +
+                    "empty or contained only spaces following the operations."
+                )
+            print('Done.')
+            print()
+            self.show_counts()
 
     # ====================
     def preview_before_and_after(self,
@@ -381,6 +408,23 @@ def display_text_wrapped(content: str):
 
     content = html.escape(content)
     display_html(WRAP_PRE + f"<pre>{content}</pre>")
+
+
+# ====================
+def save_pickle(data: Any, fp: str):
+    """Save data to a .pickle file"""
+
+    with open(fp, 'wb') as f:
+        pickle.dump(data, f)
+
+
+# ====================
+def load_pickle(fp: str) -> Any:
+    """Load a .pickle file and return the data"""
+
+    with open(fp, 'rb') as f:
+        unpickled = pickle.load(f)
+    return unpickled
 
 
 # # === CONTEXT MANAGERS ===
