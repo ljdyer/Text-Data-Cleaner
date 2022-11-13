@@ -223,7 +223,7 @@ class TextDataCleaner:
 
         if note is not None:
             self.last_previewed = self.last_previewed + (note,)
-        self.replace()
+        self.replace(self.last_previewed)
 
     # ====================
     def replace(self,
