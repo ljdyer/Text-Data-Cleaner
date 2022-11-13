@@ -24,18 +24,10 @@ NAMED_OPERATIONS = {
 }
 
 
-# ====================
-def set_css():
-    display(HTML('''
-    <style>
-        pre {
-            white-space: pre-wrap;
-        }
-    </style>
-    '''))
 
 
-get_ipython().events.register('pre_run_cell', set_css)
+
+get_ipython().events.register('pre_run_cell', wrap_output)
 
 
 # ====================
@@ -219,7 +211,7 @@ class TextDataCleaner:
         )
         print()
         self.last_previewed = find_replace
-        print("To apply this replacement operation to the dataset, run the" +
+        print("To apply this replacement operation to the dataset, run the " +
               "apply_last_previewed method.")
 
     # ====================
@@ -356,17 +348,35 @@ def get_context_after(text: str,
 def show_change_(before, after):
 
     if before > after:
-        return f'<span style="color:green">↓ {after-before}</span>'
+        return f'<span style="color:green">↓ {before-after}</span>'
     elif after < before:
-        return f'<span style="color:red">↑ {before-after}</span>'
+        return f'<span style="color:red">↑ {after-before}</span>'
     else:
         return 'no change'
 
 
 # ====================
-def display_html(x: str):
+def display_html(content: str):
 
-    display(HTML(x))
+    display(HTML(content))
+
+
+# ====================
+def display_html_pre(content: str):
+
+    display_html(f"<pre>{content}</pre>")
+
+
+# ====================
+def wrap_output():
+
+    display_html('''
+    <style>
+        pre {
+            white-space: pre-wrap;
+        }
+    </style>
+    ''')
 
 
 # # === CONTEXT MANAGERS ===
