@@ -171,7 +171,8 @@ class TextDataCleaner:
         print('=============')
         self.show_counts(show_change=False)
         print()
-        for operation in self.operation_history:
+        operation_history = self.operation_history.copy()
+        for operation in operation_history:
             print(operation)
             if isinstance(operation, tuple):
                 self.replace(operation, verbose_mode=False)
