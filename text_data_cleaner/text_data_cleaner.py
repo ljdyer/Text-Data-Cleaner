@@ -8,6 +8,7 @@ import pandas as pd
 from IPython.display import display, HTML
 
 from typing import Union, List, Tuple
+from contextlib import contextmanager
 
 PREVIEW_BEFORE = """\
 <pre>{ellipsis_before}{text_before}\
@@ -136,14 +137,12 @@ class TextDataCleaner:
                 }
             )
         samples_df = pd.DataFrame(samples)
-        colheader_justify_before = pd.get_option("display.colheader_justify")
-        pd.set_option("display.colheader_justify", "center")
-        display(
-            HTML(
-                samples_df.to_html(escape=False, index=False)
+        with pandas_options(('display.colheader_justify', 'center')):
+            display(
+                HTML(
+                    samples_df.to_html(escape=False, index=False)
+                )
             )
-        )
-        pd.set_option("display.colheader_justify", colheader_justify_before)
         print(
             f'Total of {len(doc_and_match_idxs)} matches in {num_docs_with_matches}',
             'documents (rows).'
@@ -307,3 +306,14 @@ def normalize_unicode_string(input_str: str) -> str:
 
     return (unicodedata.normalize('NFKD', input_str)
             .encode('ascii', 'ignore').decode('utf8'))
+
+
+# =====
+@contextmanager
+def pandas_options(options: Union[List[Tuple], Tuple]):
+
+    # before = pd.get_option("display.colheader_justify")
+    # pd.set_option("display.colheader_justify", "center")
+    print('Doing stuff before')
+    yield
+    print('Doing stuff after')
