@@ -224,9 +224,9 @@ def preview_before_and_after(doc: str,
     text_after = doc[match_end:text_end]
     preview_before = PREVIEW_BEFORE.format(
         ellipsis_before=ellipsis_before,
-        text_before=html.escape(text_before).rjust(context_chars_before_after),
+        text_before=html.escape(text_before.rjust(context_chars_before_after)),
         match=html.escape(match_str),
-        text_after=html.escape(text_after).ljust(context_chars_before_after),
+        text_after=html.escape(text_after.ljust(context_chars_before_after)),
         ellipsis_after=ellipsis_after
     )
     preview_after = ''
