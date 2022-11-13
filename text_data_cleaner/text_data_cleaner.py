@@ -314,7 +314,9 @@ def pandas_options(options: List[Tuple]):
 
     before = [pd.get_option(option_name) for option_name, _ in options]
     for option in options:
+        print(*option)
         pd.set_option(*option)
     yield
     for option_idx, option in enumerate(options):
+        print(before[option_idx])
         pd.set_option(option[0], before[option_idx])
