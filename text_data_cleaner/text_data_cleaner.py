@@ -137,7 +137,7 @@ class TextDataCleaner:
                 }
             )
         samples_df = pd.DataFrame(samples)
-        with pandas_options(('display.colheader_justify', 'center')):
+        with pandas_options([('display.colheader_justify', 'center')]):
             display(
                 HTML(
                     samples_df.to_html(escape=False, index=False)
@@ -314,9 +314,7 @@ def pandas_options(options: List[Tuple]):
 
     before = [pd.get_option(option_name) for option_name, _ in options]
     for option in options:
-        print(*option)
         pd.set_option(*option)
     yield
     for option_idx, option in enumerate(options):
-        print(before[option_idx])
         pd.set_option(option[0], before[option_idx])
