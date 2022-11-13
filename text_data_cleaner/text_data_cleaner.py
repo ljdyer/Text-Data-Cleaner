@@ -123,7 +123,7 @@ class TextDataCleaner:
         unwanted_unique = set(unwanted_counter.keys())
         print(f'Total of {unwanted_total} occurrences of',
               f'{len(unwanted_unique)} unwanted characters',
-              'in dataframe.')
+              'in dataset.')
         print(', '.join(unwanted_unique))
         top_10 = ', '.join(
             [f'{char} ({count})'
