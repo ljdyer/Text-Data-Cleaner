@@ -2,7 +2,7 @@ import html
 import re
 import unicodedata
 from collections import Counter
-
+import random
 import numpy as np
 import pandas as pd
 from IPython.display import display, HTML
@@ -112,32 +112,37 @@ class TextDataCleaner:
         if num_docs_with_matches == 0:
             print('No matches found!')
             return
-        matches_all = []
-        for doc_idx, matches in enumerate(matches_by_doc):
-            for match_idx, match in enumerate(matches):
-                preview_before, preview_after = preview_before_and_after(
-                    docs[doc_idx], find, replace, match, context_chars_before_after)
-                matches_all.append(
-                    {
-                        'Document index': doc_idx,
-                        'Match number': f"{match_idx+1} of {len(matches)}",
-                        'Before': preview_before,
-                        'After': preview_after
-                    }
-                )
-        matches_df = pd.DataFrame(matches_all)
+        doc_and_match_idxs = [
+            (doc_idx, match_idx) 
+            for doc_idx in range(len(docs))
+            for match_idx in range(len(matches_by_doc[doc_idx]))
+        ]
+        sample_idxs = random.sample(doc_and_match_idxs, k=num_samples)
+        samples = []
+        for doc_idx, match_idx in sample_idxs:
+            doc = docs[doc_idx]
+            match = matches_by_doc[doc_idx][match_idx]
+            preview_before, preview_after = preview_before_and_after(
+                doc, find, replace, match, context_chars_before_after)
+            samples.append(
+                {
+                    'Document index': doc_idx,
+                    'Match number': f"{match_idx+1} of {len(matches_by_doc[doc_idx])}",
+                    'Before': preview_before,
+                    'After': preview_after
+                }
+            )
+        samples_df = pd.DataFrame(samples)
         colheader_justify_before = pd.get_option("display.colheader_justify")
         pd.set_option("display.colheader_justify", "center")
         display(
             HTML(
-                matches_df.sample(
-                    n=min(len(matches_df), num_samples)
-                ).to_html(escape=False, index=False)
+                samples_df.to_html(escape=False, index=False)
             )
         )
         pd.set_option("display.colheader_justify", colheader_justify_before)
         print(
-            f'Total of {len(matches_all)} matches in {num_docs_with_matches}',
+            f'Total of {len(doc_and_match_idxs)} matches in {num_docs_with_matches}',
             'documents (rows).'
         )
 
