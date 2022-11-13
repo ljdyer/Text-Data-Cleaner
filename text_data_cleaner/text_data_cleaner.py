@@ -219,7 +219,7 @@ def preview_before_and_after(doc: str,
     text_start = max(0, match_start-context_chars_before_after)
     ellipsis_before = '... ' if text_start > 0 else '    '
     text_end = min(match_end+context_chars_before_after, len(doc))
-    ellipsis_after = ' ...' if text_end < len(text) else '    '
+    ellipsis_after = ' ...' if text_end < len(doc) else '    '
     text_before = doc[text_start:match_start]
     text_after = doc[match_end:text_end]
     preview_before = PREVIEW_BEFORE.format(
