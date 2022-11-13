@@ -7,7 +7,7 @@ import numpy as np
 import pandas as pd
 from IPython.display import display, HTML
 
-from typing import Union, List
+from typing import Union, List, Tuple
 
 
 # ====================
@@ -72,12 +72,31 @@ class TextDataCleaner:
 
     # ====================
     def preview_replace(self,
-                        find: str,
-                        replace: str,
+                        find_replace: Tuple[str],
                         num_samples: int = 10,
                         context_chars_before_after: int = 25,
                         normalize_spaces: bool = True):
+        """Preview the effect of carrying out a regular expression replacement
+        operation on the dataset.
 
+        Args:
+          find_replace (Tuple[str]):
+            A tuple (find, replace) of the regular expression find and replace strings.
+            Examples:
+                (r'[\(|\)]', '')    # noqa W605
+                (r'([0-9]+):([0-9]+)', r'\1 \2')
+          num_samples (int, optional):
+            The number of samples (locations in documents where a replacement would take place)
+            to display. Defaults to 10.
+          context_chars_before_after (int, optional):
+            The number of characters to display before and after the replacement location in
+            each sample. Defaults to 25.
+          normalize_spaces (bool, optional):
+            Whether to normalize spaces (replace two or more subsequent spaces with a single
+            space) after carryig out the replacement operation. Defaults to True.
+        """
+
+        find, replace = find_replace
         docs = self.docs_latest
         matches_by_doc = [list(re.finditer(find, text)) for text in docs]
         num_docs_with_matches = len([m for m in matches_by_doc if len(m) > 0])
@@ -99,7 +118,7 @@ class TextDataCleaner:
                     }
                 )
         matches_df = pd.DataFrame(matches_all)
-        pd.set_option('display.max_colwidth', None)
+        # pd.set_option('display.max_colwidth', None)
         display(
             HTML(
                 matches_df.sample(
