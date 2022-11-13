@@ -103,6 +103,7 @@ class TextDataCleaner:
             If unwanted_chars has not been set for the class instances and
             is also not passed as a parameter.
         """
+
         if unwanted_chars is not None:
             self.unwanted_chars = unwanted_chars
         else:
@@ -133,12 +134,22 @@ class TextDataCleaner:
 
         for operation_idx, operation in enumerate(
          self.operation_history, start=1):
-            print(f"{operation_idx}: ", end='')
+            this_operation = {'Operation no.': operation_idx}
             if isinstance(operation, tuple):
-                find, replace = operation
-                print(f'Regex replacement: {find} => {replace}')
+                find, replace = operation[:1]
+                this_operation.update({
+                    'Type': 'Regex replacement',
+                    'Find': f"<pre>{find}</pre>",
+                    'Replace': f"<pre>{replace}</pre>"
+                })
+                if len(operation) > 2:
+                    this_operation['Note'] = operation[2]
             elif isinstance(operation, str):
-                print(operation)
+                this_operation['Type'] = NAMED_OPERATIONS[operation]
+            operations.append(this_operation)
+        operations_df = pd.DataFrame(operations)
+        with pandas_options([('display.colheader_justify', 'center')]):
+            display_html(operations_df.to_html(escape=False, index=False))
 
     # ====================
     def preview_replace(self,
@@ -154,6 +165,8 @@ class TextDataCleaner:
             Examples:
                 (r'[\(|\)]', '')    # noqa W605
                 (r'([0-9]+):([0-9]+)', r'\1 \2')
+            The tuple can also have an optional third element, which will be treated as
+            a note and displayed when showing operation history.
           num_samples (int, optional):
             The number of samples (locations in documents where a replacement would take place)
             to display. Defaults to 10.
@@ -162,7 +175,7 @@ class TextDataCleaner:
             each sample. Defaults to 25.
         """
 
-        find, replace = find_replace
+        find, replace = find_replace[:1]
         docs = self.docs_latest
         matches_by_doc = [list(re.finditer(find, text)) for text in docs]
         num_docs_with_matches = len([m for m in matches_by_doc if len(m) > 0])
@@ -195,11 +208,7 @@ class TextDataCleaner:
             )
         samples_df = pd.DataFrame(samples)
         with pandas_options([('display.colheader_justify', 'center')]):
-            display(
-                HTML(
-                    samples_df.to_html(escape=False, index=False)
-                )
-            )
+            display_html(samples_df.to_html(escape=False, index=False))
         print(
             f'Total of {len(doc_and_match_idxs)} matches in ' +
             f'{num_docs_with_matches} documents (rows).'
@@ -210,9 +219,11 @@ class TextDataCleaner:
               "apply_last_previewed method.")
 
     # ====================
-    def apply_last_previewed(self):
+    def apply_last_previewed(self, note: str = None):
 
-        self.replace(self.last_previewed)
+        if note is not None:
+            self.last_previewed = self.last_previewed + (note,)
+        self.replace()
 
     # ====================
     def replace(self,
@@ -227,11 +238,13 @@ class TextDataCleaner:
             Examples of (find, replace) tuples:
                 (r'[\(|\)]', '')    # noqa W605
                 (r'([0-9]+):([0-9]+)', r'\1 \2')
+            Tuples can also have an optional third element, which will be treated as
+            a note and displayed when showing operation history.
         """                
 
         if isinstance(find_replace, tuple):
             find_replace = [find_replace]
-        for find, replace in find_replace:
+        for find, replace in find_replace[:1]:
             self.docs_latest = [
                 self.re_replace(find, replace, doc) for doc in self.docs_latest
             ]
