@@ -1,14 +1,13 @@
 import html
+import random
 import re
 import unicodedata
 from collections import Counter
-import random
-import numpy as np
-import pandas as pd
-from IPython.display import display, HTML
-
-from typing import Union, List, Tuple
 from contextlib import contextmanager
+from typing import List, Tuple, Union
+
+import pandas as pd
+from IPython.display import HTML, display
 
 PREVIEW_BEFORE = """\
 <pre>{ellipsis_before}{text_before}\
@@ -18,6 +17,10 @@ PREVIEW_AFTER = """\
 <pre>{ellipsis_before}{text_before}\
 <span style="color:green">{replacement}</span>\
 {text_after}{ellipsis_after}</pre>"""
+
+NAMED_OPERATIONS = {
+    'NORMALIZE_UNICODE_TO_ASCII': 'Normalize unicode to ascii'
+}
 
 
 # ====================
@@ -33,8 +36,8 @@ class TextDataCleaner:
           docs (Union[List, pd.Series]):
             The list of documents to clean.
           normalize_spaces (bool, optional):
-            Whether or not to replace two or more subsequent spaces with a single
-            space after carrying out each operation. Defaults to True.
+            Whether or not to replace two or more subsequent spaces with a
+            single space after carrying out each operation. Defaults to True.
         """
 
         if isinstance(docs, pd.Series):
@@ -54,20 +57,33 @@ class TextDataCleaner:
         num_docs = len(docs)
         num_tokens = sum(map(len, map(lambda x: x.split(), docs)))
         num_chars = sum(map(len, docs))
-        print('Number of documents: ', num_docs)
-        print('Total number of tokens: ', num_tokens)
-        print('Total number of characters: ', num_chars)
+        print('Number of documents:', num_docs)
+        print('Total number of tokens:', num_tokens)
+        print('Total number of characters:', num_chars)
 
     # ====================
     def show_unwanted_chars(self,
                             unwanted_chars: str = None):
+        """Show unwanted characters in the latest version of the dataset
 
+        Args:
+          unwanted_chars (str, optional):
+            A regular expression that matches unwanted characters.
+            E.g. r'[^A-Za-z0-9 \.,]'      # noqa: W605
+            if you only want alphanumeric characters, spaces, periods,
+            and commas in the cleaned dataset.
+
+        Raises:
+          ValueError:
+            If unwanted_chars has not been set for the class instances and
+            is also not passed as a parameter.
+        """
         if unwanted_chars is not None:
             self.unwanted_chars = unwanted_chars
         else:
             if not hasattr(self, 'unwanted_chars'):
                 raise ValueError(
-                    "unwanted characters have not been specified. " +
+                    "Unwanted characters have not been specified. " +
                     "Call the method again with the unwanted_chars parameter."
                 )
         docs = self.docs_latest
@@ -86,6 +102,18 @@ class TextDataCleaner:
              for char, count in unwanted_counter.most_common(10)]
         )
         print('Most common (up to 10 displayed): ', top_10)
+
+    # ====================
+    def show_operation_history(self):
+
+        for operation_idx, operation in enumerate(
+         self.operation_history(), start=1):
+            print(f"{operation_idx}: ", end='')
+            if isinstance(operation, tuple):
+                find, replace = operation
+                print(f'Regex replacement: {find} => {replace}')
+            elif isinstance(operation, str):
+                print(operation)
 
     # ====================
     def preview_replace(self,
@@ -155,6 +183,17 @@ class TextDataCleaner:
     # ====================
     def replace(self,
                 find_replace: Union[List[Tuple], Tuple]):
+        """Perform a regular expression replacement operation on the whole
+        dataset.
+
+        Args:
+          find_replace (Union[List[Tuple], Tuple]):
+            A tuple (find, replace) of regular expression find and replace strings,
+            or a list of such tuples.
+            Examples of (find, replace) tuples:
+                (r'[\(|\)]', '')    # noqa W605
+                (r'([0-9]+):([0-9]+)', r'\1 \2')
+        """                
 
         if isinstance(find_replace, tuple):
             find_replace = [find_replace]
@@ -171,13 +210,14 @@ class TextDataCleaner:
         len_after = len(self.docs_latest)
         if len_after < len_before:
             print(
-                "Removed {len_before-len_after} documents that were empty or " +
-                "contained only spaces following the operations."
+                "Removed {len_before-len_after} documents that were empty " +
+                "or contained only spaces following the operations."
             )
         print('Done.')
         self.operation_history.extend(find_replace)
         print()
         print('Latest counts:')
+        print('==============')
         self.show_counts()
 
     # ====================
@@ -210,7 +250,7 @@ class TextDataCleaner:
         ellipsis_before, context_before = \
             get_context_before(text_before, context_chars_before_after)
         ellipsis_after, context_after = \
-            get_context_after(text_after, context_chars_before_after)   
+            get_context_after(text_after, context_chars_before_after)
         preview_after = PREVIEW_AFTER.format(
             ellipsis_before=ellipsis_before,
             text_before=html.escape(context_before),
@@ -231,32 +271,23 @@ class TextDataCleaner:
             replaced = re.sub(r'  +', ' ', replaced)
         return replaced
 
-# # ====================
-# def normalize_unicode(df: pd.DataFrame,
-#                       text_column_name='Text'
-#                       ) -> pd.DataFrame:
+    # ====================
+    def normalize_unicode_to_ascii(self):
+        """Normalize all unicode characters in the dataset to the ascii equivalents.
 
-#     """Normalize unicode characters (replace accented characters with their
-#     non-accented equivalents & remove other non-ascii characters) in all cells
-#     in the text column of your dataframe.
+        Replaces accented characters with their non-accented equivalents and
+        removes other non-ascii characters.
+        """
 
-#     Required arguments:
-#     -------------------
-#     df: pd.DataFrame                    A dataframe with a text column
-
-#     Optional keyword arguments:
-#     ---------------------------
-#     text_column_name: str = 'Text'      The name of the text column in the
-#                                         dataframe
-#     """
-
-#     df[text_column_name] = df[text_column_name].apply(normalize_unicode_string)
-#     return df
+        self.docs_latest = [
+            (unicodedata.normalize('NFKD', doc)
+                .encode('ascii', 'ignore').decode('utf8'))
+            for doc in self.docs_latest
+        ]
+        self.operation_history.append('NORMALIZE-UNICODE-TO-ASCII')
 
 
 # # === HELPER FUNCTIONS ===
-
-
 
 # ====================
 def get_context_before(text: str,
@@ -276,16 +307,7 @@ def get_context_after(text: str,
     return ellipsis, context
 
 
-# ====================
-def normalize_unicode_string(input_str: str) -> str:
-
-    """Normalize unicode characters (replace accented characters with their
-    non-accented equivalents & remove other non-ascii characters) in a
-    string"""
-
-    return (unicodedata.normalize('NFKD', input_str)
-            .encode('ascii', 'ignore').decode('utf8'))
-
+# # === CONTEXT MANAGERS ===
 
 # =====
 @contextmanager
