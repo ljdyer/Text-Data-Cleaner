@@ -7,22 +7,39 @@ import numpy as np
 import pandas as pd
 from IPython.display import HTML
 
+from typing import Union, List
+
 
 # ====================
 class TextDataCleaner:
 
     # ====================
-    def __init__(self, texts: pd.Series):
+    def __init__(self, docs: Union[List, pd.Series]):
+        """Initialize an instance of the class
 
-        self.texts_orig = texts
-        self.texts_latest = texts
+        Args:
+          docs (Union[List, pd.Series]):
+            The list of documents to clean.
+        """
+
+        if isinstance(docs, pd.Series):
+            docs = docs.to_list()    
+        self.docs_orig = docs
+        self.docs_latest = docs
 
     # ====================
-    def show_doc_and_word_counts(self):
+    def show_counts(self):
+        """Print the numbers of documents, tokens, and characters in the
+        latest version of the dataset.
+        """        
     
-        num_docs = len(self.texts_latest)
-        num_words = sum(self.texts_latest.apply(lambda x: len(x.split())))
-        print(f'{num_words} words in {num_docs} documents.')
+        docs = self.docs_latest
+        num_docs = len(docs)
+        num_tokens = sum(map(len, map(lambda x: x.split(), docs)))
+        num_chars = sum(map(len, docs))
+        print('Number of documents: ', num_docs)
+        print('Total number of tokens: ', num_tokens)
+        print('Total number of characters: ', num_chars)
 
     # ====================
     def show_prohibited_chars(self,
@@ -38,8 +55,8 @@ class TextDataCleaner:
                 )
 
         prohibited_counter = Counter()
-        texts_list = self.texts_latest.to_list()
-        for text in texts_list:
+        docs_list = self.docs_latest.to_list()
+        for text in docs_list:
             all_matches = re.findall(prohibited_chars, text)
             if all_matches:
                 for match in all_matches:
@@ -66,8 +83,8 @@ class TextDataCleaner:
 
         matches = []
         num_docs_with_matches = 0
-        texts_list = self.texts_latest.to_list()
-        for index, text in enumerate(texts_list):
+        docs_list = self.docs_latest.to_list()
+        for index, text in enumerate(docs_list):
             iter_matches = list(re.finditer(find_re, text))
             if iter_matches:
                 num_docs_with_matches += 1
@@ -98,51 +115,54 @@ class TextDataCleaner:
             'documents (rows).')
 
 
-# # ====================
-# def regex_replace(regex_list: list,
-#                   df: pd.DataFrame,
-#                   text_column_name: str = 'Text',
-#                   norm_spaces: bool = True,
-#                   drop_empty_rows: bool = True
-#                   ) -> pd.DataFrame:
 
-#     """Perform a sequence of one or more regex replace operations on all cells
-#     in the text column of your dataframe
 
-#     Required arguments:
-#     -------------------
-#     regex_list: list                    A list of (find, replace) tuples
-#                                         e.g. (r'\(\w+\)', r'')
-#     df: pd.DataFrame                    A dataframe with a text column
+    # ====================
+    def regex_replace(self,
+                      regex_list: list,
+                    df: pd.DataFrame,
+                    text_column_name: str = 'Text',
+                    norm_spaces: bool = True,
+                    drop_empty_rows: bool = True
+                    ) -> pd.DataFrame:
 
-#     Optional keyword arguments:
-#     ---------------------------
-#     text_column_name: str = 'Text'      The name of the text column in the
-#                                         dataframe
-#     norm_spaces: bool = True,           If True, normalizes spaces after
-#                                         performing replacement
-#     drop_empty_rows: bool = True        If True, drops any rows with empty
-#                                         strings following replacement
-#     """
+        """Perform a sequence of one or more regex replace operations on all cells
+        in the text column of your dataframe
 
-#     for find_re, replace_re in regex_list:
-#         df[text_column_name] = df[text_column_name].apply(
-#             lambda x: re.sub(find_re, replace_re, x))
+        Required arguments:
+        -------------------
+        regex_list: list                    A list of (find, replace) tuples
+                                            e.g. (r'\(\w+\)', r'')
+        df: pd.DataFrame                    A dataframe with a text column
 
-#     # Normalize spaces
-#     if norm_spaces:
-#         df = normalize_spaces(df, text_column_name=text_column_name)
+        Optional keyword arguments:
+        ---------------------------
+        text_column_name: str = 'Text'      The name of the text column in the
+                                            dataframe
+        norm_spaces: bool = True,           If True, normalizes spaces after
+                                            performing replacement
+        drop_empty_rows: bool = True        If True, drops any rows with empty
+                                            strings following replacement
+        """
 
-#     # Drop empty rows
-#     if drop_empty_rows:
-#         df[text_column_name].replace('', np.nan, inplace=True)
-#         df[text_column_name].replace(' ', np.nan, inplace=True)
-#         df.dropna(subset=[text_column_name], inplace=True)
+        for find_re, replace_re in regex_list:
+            df[text_column_name] = df[text_column_name].apply(
+                lambda x: re.sub(find_re, replace_re, x))
 
-#     print('Done.')
-#     show_doc_and_word_counts(df, text_column_name=text_column_name)
+        # Normalize spaces
+        if norm_spaces:
+            df = normalize_spaces(df, text_column_name=text_column_name)
 
-#     return df
+        # Drop empty rows
+        if drop_empty_rows:
+            df[text_column_name].replace('', np.nan, inplace=True)
+            df[text_column_name].replace(' ', np.nan, inplace=True)
+            df.dropna(subset=[text_column_name], inplace=True)
+
+        print('Done.')
+        show_doc_and_word_counts(df, text_column_name=text_column_name)
+
+        return df
 
 
 # # ====================
