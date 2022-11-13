@@ -169,7 +169,7 @@ class TextDataCleaner:
         self.docs_latest = self.docs_original
         print('Original docs')
         print('=============')
-        self.show_counts()
+        self.show_counts(show_change=False)
         print()
         for operation in self.operation_history:
             print(operation)
