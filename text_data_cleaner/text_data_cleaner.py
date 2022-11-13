@@ -11,7 +11,7 @@ from typing import Union, List, Tuple
 
 PREVIEW_BEFORE = """\
 <pre>{ellipsis_before}{text_before}\
-<span color="red">{match}</span>\
+<span style="color:red">{match}</span>\
 {text_after}{ellipsis_after}</pre>
 """
 
