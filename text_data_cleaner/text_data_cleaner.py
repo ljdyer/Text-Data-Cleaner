@@ -13,6 +13,10 @@ PREVIEW_BEFORE = """\
 <pre>{ellipsis_before}{text_before}\
 <span style="color:red">{match}</span>\
 {text_after}{ellipsis_after}</pre>"""
+PREVIEW_AFTER = """\
+<pre>{ellipsis_before}{text_before}\
+<span style="color:green">{replacement}</span>\
+{text_after}{ellipsis_after}</pre>"""
 
 
 # ====================
@@ -212,10 +216,10 @@ class TextDataCleaner:
 
 # ====================
 def preview_before_and_after(doc: str,
-                                 find: str,
-                                 replace: str,
-                                 match: re.Match,
-                                 context_chars_before_after: int) -> Tuple[str]:
+                             find: str,
+                             replace: str,
+                             match: re.Match,
+                             context_chars_before_after: int) -> Tuple[str]:
 
     match_start, match_end = match.span()
     match_str = doc[match_start:match_end]
@@ -232,26 +236,17 @@ def preview_before_and_after(doc: str,
         text_after=html.escape(text_after.ljust(context_chars_before_after)),
         ellipsis_after=ellipsis_after
     )
-    preview_after = ''
+    text_before = re.sub(find, replace, text_before)
+    text_after = re.sub(find, replace, text_after)
+    replacement = re.sub(find, replace, match_str)
+    preview_after = PREVIEW_AFTER.format(
+        ellipsis_before=ellipsis_before,
+        text_before=html.escape(text_before.rjust(context_chars_before_after)),
+        replacement=html.escape(replacement),
+        text_after=html.escape(text_after.ljust(context_chars_before_after)),
+        ellipsis_after=ellipsis_after
+    )
     return preview_before, preview_after
-
-# ====================
-def color_replacements_green(find_re: str,
-                             replace_re: str,
-                             input_str: str,
-                             norm_spaces: bool
-                             ) -> str:
-    """Perform a regex find and replace operation on an HTML string in which all of
-    the replaced parts are colored green"""
-
-    colored = re.sub(find_re, rf'GREEN_START{replace_re}COLOR_END', input_str)
-    if norm_spaces:
-        colored = normalize_spaces_string(colored)
-    colored = html.escape(colored)
-    colored = colored.replace('GREEN_START', '<span style="color:green">')
-    colored = colored.replace('COLOR_END', '</span>')
-    return colored
-
 
 # ====================
 def normalize_spaces(df: pd.DataFrame,
