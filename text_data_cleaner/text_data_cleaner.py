@@ -198,6 +198,11 @@ def get_context_str(text: str,
     ellipsis_before = '...' if start_pos > 0 else ''
     end_pos = min(match_end+context_chars_before_after, len(text))
     ellipsis_after = '...' if end_pos < len(text) else ''
+    print(
+        ellipsis_before,
+        text[start_pos:end_pos],
+        ellipsis_after
+    )
     return ellipsis_before + text[start_pos:end_pos] + ellipsis_after
 
 
