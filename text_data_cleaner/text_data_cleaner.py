@@ -136,7 +136,7 @@ class TextDataCleaner:
          self.operation_history, start=1):
             this_operation = {'Operation no.': operation_idx}
             if isinstance(operation, tuple):
-                find, replace = operation[:1]
+                find, replace = operation[:2]
                 this_operation.update({
                     'Type': 'Regex replacement',
                     'Find': f"<pre>{find}</pre>",
@@ -175,7 +175,7 @@ class TextDataCleaner:
             each sample. Defaults to 25.
         """
 
-        find, replace = find_replace[:1]
+        find, replace = find_replace[:2]
         docs = self.docs_latest
         matches_by_doc = [list(re.finditer(find, text)) for text in docs]
         num_docs_with_matches = len([m for m in matches_by_doc if len(m) > 0])
@@ -244,7 +244,7 @@ class TextDataCleaner:
 
         if isinstance(find_replace, tuple):
             find_replace = [find_replace]
-        for find, replace in find_replace[:1]:
+        for find, replace in find_replace[:2]:
             self.docs_latest = [
                 self.re_replace(find, replace, doc) for doc in self.docs_latest
             ]
