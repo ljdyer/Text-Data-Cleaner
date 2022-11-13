@@ -122,6 +122,8 @@ class TextDataCleaner:
                     }
                 )
         matches_df = pd.DataFrame(matches_all)
+        colheader_justify_before = pd.get_option("display.colheader_justify")
+        pd.set_option("display.colheader_justify", "center")
         display(
             HTML(
                 matches_df.sample(
@@ -129,6 +131,7 @@ class TextDataCleaner:
                 ).to_html(escape=False, index=False)
             )
         )
+        pd.set_option("display.colheader_justify", colheader_justify_before)
         print(
             f'Total of {len(matches_all)} matches in {num_docs_with_matches}',
             'documents (rows).'
@@ -231,30 +234,6 @@ def preview_before_and_after(doc: str,
     )
     preview_after = ''
     return preview_before, preview_after
-
-    
-
-    
-
-
-
-
-
-# ====================
-def get_context_str(text: str,
-                    match: re.Match,
-                    context_chars_before_after: int) -> str:
-    """Return a substring showing the context of a regex match in a string"""
-
-    pass
-
-
-# ====================
-def color_matches_red(find_re: str, input_str: str) -> str:
-    """Return an HTML string in which all instances of the regex in the string
-    are colored red"""
-
-    pass
 
 # ====================
 def color_replacements_green(find_re: str,
