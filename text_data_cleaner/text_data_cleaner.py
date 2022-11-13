@@ -434,7 +434,6 @@ def load_pickle(fp: str) -> Any:
     """Load a .pickle file and return the data"""
 
     if 'http' in fp:
-        print("Loading from URL.")
         with(urllib.request.urlopen(fp)) as f:
             unpickled = pickle.load(f)    
     else:
