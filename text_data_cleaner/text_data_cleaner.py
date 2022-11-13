@@ -231,30 +231,53 @@ def preview_before_and_after(doc: str,
 
     match_start, match_end = match.span()
     match_str = doc[match_start:match_end]
-    text_start = max(0, match_start-context_chars_before_after)
-    ellipsis_before = '... ' if text_start > 0 else '    '
-    text_end = min(match_end+context_chars_before_after, len(doc))
-    ellipsis_after = ' ...' if text_end < len(doc) else '    '
-    text_before = doc[text_start:match_start]
-    text_after = doc[match_end:text_end]
+    text_before = doc[:match_start]
+    text_after = doc[match_end:]
+    ellipsis_before, context_before = \
+        get_context_before(text_before, context_chars_before_after)
+    ellipsis_after, context_after = \
+        get_context_after(text_after, context_chars_before_after)
     preview_before = PREVIEW_BEFORE.format(
         ellipsis_before=ellipsis_before,
-        text_before=html.escape(text_before.rjust(context_chars_before_after)),
+        text_before=html.escape(context_before),
         match=html.escape(match_str),
-        text_after=html.escape(text_after.ljust(context_chars_before_after)),
+        text_after=html.escape(context_after),
         ellipsis_after=ellipsis_after
     )
     text_before = re.sub(find, replace, text_before)
     text_after = re.sub(find, replace, text_after)
     replacement = re.sub(find, replace, match_str)
+    ellipsis_before, context_before = \
+        get_context_before(text_before, context_chars_before_after)
+    ellipsis_after, context_after = \
+        get_context_after(text_after, context_chars_before_after)   
     preview_after = PREVIEW_AFTER.format(
         ellipsis_before=ellipsis_before,
-        text_before=html.escape(text_before.rjust(context_chars_before_after)),
+        text_before=html.escape(context_before),
         replacement=html.escape(replacement),
-        text_after=html.escape(text_after.ljust(context_chars_before_after)),
+        text_after=html.escape(context_after),
         ellipsis_after=ellipsis_after
     )
     return preview_before, preview_after
+
+
+# ====================
+def get_context_before(text: str,
+                       context_len: int) -> Tuple[str, str]:
+
+    ellipsis = '... ' if len(text) > context_len else '    '
+    context = text[-context_len:].rjust(context_len)
+    return ellipsis, context
+
+
+# ====================
+def get_context_after(text: str,
+                      context_len: int) -> Tuple[str, str]:
+
+    ellipsis = ' ...' if len(text) > context_len else '    '
+    context = text[:context_len].ljust(context_len)
+    return ellipsis, context
+
 
 # ====================
 def normalize_spaces(df: pd.DataFrame,
