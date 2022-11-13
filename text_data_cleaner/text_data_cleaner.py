@@ -19,7 +19,7 @@ PREVIEW_AFTER = """\
 {text_after}{ellipsis_after}</pre>"""
 
 NAMED_OPERATIONS = {
-    'NORMALIZE_UNICODE_TO_ASCII': 'Normalize unicode to ascii'
+    'NORMALIZE-UNICODE-TO-ASCII': 'Normalize unicode to ascii'
 }
 
 WRAP_PRE = "<style>pre {white-space: pre-wrap;}</style>"
@@ -319,10 +319,10 @@ class TextDataCleaner:
 
     # ====================
     def normalize_unicode_to_ascii(self):
-        """Normalize all unicode characters in the dataset to the ascii equivalents.
+        """Normalize all unicode characters in the dataset to the ASCII equivalents.
 
         Replaces accented characters with their non-accented equivalents and
-        removes other non-ascii characters.
+        removes other non-ASCII characters.
         """
 
         self.docs_latest = [
