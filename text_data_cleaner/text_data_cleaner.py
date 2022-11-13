@@ -148,7 +148,7 @@ class TextDataCleaner:
             elif isinstance(operation, str):
                 this_operation['Type'] = NAMED_OPERATIONS[operation]
             operations.append(this_operation)
-        operations_df = pd.DataFrame(operations)
+        operations_df = pd.DataFrame(operations).fillna('')
         with pandas_options([('display.colheader_justify', 'center')]):
             display_html(operations_df.to_html(escape=False, index=False))
 
