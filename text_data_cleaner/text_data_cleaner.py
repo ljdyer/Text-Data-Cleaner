@@ -168,6 +168,7 @@ class TextDataCleaner:
 
         self.docs_latest = self.docs_original
         for operation in self.operation_history:
+            print(operation)
             if isinstance(operation, tuple):
                 self.replace(operation, verbose_mode=False)
             elif operation == "NORMALIZE-UNICODE-TO-ASCII":
