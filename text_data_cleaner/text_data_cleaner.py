@@ -44,7 +44,7 @@ class TextDataCleaner:
     # ====================
     def show_unwanted_chars(self,
                             unwanted_chars: str = None):
-                 
+
         if unwanted_chars is not None:
             self.unwanted_chars = unwanted_chars
         else:
@@ -89,6 +89,7 @@ class TextDataCleaner:
             for match_idx, match in enumerate(matches):
                 context_str = get_context_str(
                     docs[doc_idx], match, context_chars_before_after),
+                assert isinstance(context_str, str)
                 matches_all.append(
                     {
                         'Document index': doc_idx,
@@ -112,7 +113,6 @@ class TextDataCleaner:
             f'Total of {len(matches)} matches in {num_docs_with_matches}',
             'documents (rows).'
         )
-
 
     # ====================
     def regex_replace(self,
