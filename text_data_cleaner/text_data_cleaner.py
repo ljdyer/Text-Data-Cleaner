@@ -137,7 +137,10 @@ class TextDataCleaner:
                 }
             )
         samples_df = pd.DataFrame(samples)
-        with pandas_options([('display.colheader_justify', 'center')]):
+        with pandas_options([
+            ('display.colheader_justify', 'center'),
+            ('display.max_colwidth', None)
+        ]):
             display(
                 HTML(
                     samples_df.to_html(escape=False, index=False)
