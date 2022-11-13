@@ -160,7 +160,7 @@ class TextDataCleaner:
         save_pickle(self.operation_history, pickle_path)
 
     # ====================
-    def load_operations(self, pickle_path: str):
+    def load_operation_history(self, pickle_path: str):
 
         self.operation_history = load_pickle(pickle_path)
         self.refresh_latest_docs()
