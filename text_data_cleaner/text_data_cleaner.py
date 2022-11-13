@@ -132,7 +132,7 @@ class TextDataCleaner:
     def show_operation_history(self):
 
         for operation_idx, operation in enumerate(
-         self.operation_history(), start=1):
+         self.operation_history, start=1):
             print(f"{operation_idx}: ", end='')
             if isinstance(operation, tuple):
                 find, replace = operation
