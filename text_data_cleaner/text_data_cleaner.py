@@ -132,6 +132,7 @@ class TextDataCleaner:
     # ====================
     def show_operation_history(self):
 
+        operations = []
         for operation_idx, operation in enumerate(
          self.operation_history, start=1):
             this_operation = {'Operation no.': operation_idx}
