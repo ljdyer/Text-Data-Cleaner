@@ -1,6 +1,6 @@
 # Text Data Cleaner
 
-A Python library for cleaning text data for use in machine learning and natural language processing applications
+A Python library for cleaning text data for use in machine learning and natural language processing applications.
 
 Designed to be used in IPython notebooks (Jupyter, Google Colab, etc.).
 
@@ -23,7 +23,7 @@ Alternatively, scroll down for instructions on getting started and basic documen
 ### Import the `TextDataCleaner` class
 
 ```python
-from text_data_cleaner import text_data_cleaner
+from text_data_cleaner import TextDataCleaner
 ```
 
 ## Clean data using the `TextDataCleaner` class
