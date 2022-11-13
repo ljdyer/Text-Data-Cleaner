@@ -118,7 +118,6 @@ class TextDataCleaner:
                     }
                 )
         matches_df = pd.DataFrame(matches_all)
-        # pd.set_option('display.max_colwidth', None)
         display(
             HTML(
                 matches_df.sample(
@@ -126,7 +125,6 @@ class TextDataCleaner:
                 ).to_html(escape=False, index=False)
             )
         )
-        pd.set_option('display.max_colwidth', 50)
         print(
             f'Total of {len(matches)} matches in {num_docs_with_matches}',
             'documents (rows).'
@@ -228,7 +226,7 @@ def color_matches_red(find_re: str, input_str: str) -> str:
     colored = html.escape(colored)
     colored = colored.replace('RED_START', '<span style="color:red">')
     colored = colored.replace('COLOR_END', '</span>')
-    return colored
+    return "<pre>" + colored + "</pre>"
 
 # ====================
 def color_replacements_green(find_re: str,
