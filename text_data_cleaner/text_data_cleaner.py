@@ -216,7 +216,7 @@ def preview_before_and_after(doc: str,
                                  context_chars_before_after: int) -> Tuple[str]:
 
     match_start, match_end = match.span()
-    match_str = doc[match_start, match_end]
+    match_str = doc[match_start:match_end]
     text_start = max(0, match_start-context_chars_before_after)
     ellipsis_before = '... ' if text_start > 0 else '    '
     text_end = min(match_end+context_chars_before_after, len(doc))
