@@ -80,7 +80,7 @@ class TextDataCleaner:
 
         docs = self.docs_latest
         matches_by_doc = [list(re.finditer(find, text)) for text in docs]
-        num_docs_with_matches = len(m for m in matches_by_doc if len(m) > 0)
+        num_docs_with_matches = len([m for m in matches_by_doc if len(m) > 0])
         if num_docs_with_matches == 0:
             print('No matches found!')
             return
