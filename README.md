@@ -26,7 +26,7 @@ Alternatively, scroll down for instructions on getting started and basic documen
 from text_data_cleaner import TextDataCleaner
 ```
 
-## Clean data using the `TextDataCleaner` class
+## Cleaning data using the `TextDataCleaner` class
 
 ### Initialize an instance of the `TextDataCleaner` class
 
@@ -65,11 +65,11 @@ my_fre = FeatureRestorationEvaluator(
 ```python
     # ====================
     def show_unwanted_chars(self,
-                            unwanted_chars: str = None):
+                            unwanted_chars: Optional[str] = None):
         """Show unwanted characters in the latest version of the dataset
 
         Args:
-          unwanted_chars (str, optional):
+          unwanted_chars (Optional[str], optional):
             A regular expression that matches unwanted characters.
             E.g. r'[^A-Za-z0-9 \.,]'      # noqa: W605
             if you only want alphanumeric characters, spaces, periods,
@@ -134,11 +134,11 @@ data_cleaner.preview_replace((r'[\(|\)]', ''))
 
 ```python
     # ====================
-    def apply_last_previewed(self, note: str = None):
+    def apply_last_previewed(self, note: Optional[str] = None):
         """Apply the most recently previewed replacement operation.
 
         Args:
-          note (str, optional):
+          note (Optional[str], optional):
             A note to describe the replacement operation to display
             when viewing the operation history. Defaults to None.
         """
@@ -198,7 +198,8 @@ data_cleaner.replace([
 ```python
     # ====================
     def normalize_unicode_to_ascii(self):
-        """Normalize all unicode characters in the dataset to the ASCII equivalents.
+        """Normalize all unicode characters in the dataset to their ASCII
+        equivalents.
 
         Replaces accented characters with their non-accented equivalents and
         removes other non-ASCII characters.
@@ -241,7 +242,7 @@ data_cleaner.show_operation_history()
         history by applying all operations in the history to the original
         dataset from scratch.
 
-        Should be carried out after making any direct changes to the 
+        Should be carried out after making any direct changes to the
         operation_history attribute of an instance.
         """
 ```
@@ -331,4 +332,3 @@ data_cleaner.get_latest_documents(as_pandas_series=True)
 ```
 
 <img src="readme-img/10-get_latest_documents.PNG"></img>
-
